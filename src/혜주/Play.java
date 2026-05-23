@@ -23,6 +23,7 @@ import javax.swing.border.LineBorder;
 public class Play extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final int MAX_DISTANCE = 30;
+	private static final String DEFAULT_ATTACK_NAME = "공격";
 	private static final String ATTACK_IMAGE_DIR = "src" + File.separator + "혜주"
 			+ File.separator + "images" + File.separator + "attack";
 	private static final String HIT_IMAGE_DIR = "src" + File.separator + "혜주"
@@ -38,12 +39,19 @@ public class Play extends JFrame {
 	private JLabel attackNameLabel;
 	private JLabel attackerNameLabel;
 	private JLabel targetNameLabel;
-	private JLabel attackerDistanceLabel;
-	private JLabel targetDistanceLabel;
 	private JProgressBar attackerProgressBar;
 	private JProgressBar targetProgressBar;
 	private JTextArea logTextArea;
+	private JButton arrowButton;
 	private JButton closeButton;
+
+	private String pendingSituationMessage;
+	private String pendingAttackerName;
+	private String pendingTargetName;
+	private String pendingAttackName;
+	private int pendingBeforeTargetDistance;
+	private int pendingAfterTargetDistance;
+	private boolean attackFinished;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -65,7 +73,7 @@ public class Play extends JFrame {
 	public Play(JFrame mainFrame) {
 		this.mainFrame = mainFrame;
 		initialize();
-		showPlayerAttack("코끼리", "기린", "코로 때리기", 17, 15);
+		showAttack("코끼리", 17, "기린", 17, 15);
 	}
 
 	private void initialize() {
@@ -87,7 +95,7 @@ public class Play extends JFrame {
 		attackerTitleLabel.setBounds(65, 55, 260, 34);
 		contentPane.add(attackerTitleLabel);
 
-		targetTitleLabel = new JLabel("공격당한 동물");
+		targetTitleLabel = new JLabel("공격당하는 동물");
 		targetTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		targetTitleLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 22));
 		targetTitleLabel.setBorder(new LineBorder(Color.BLACK, 2));
@@ -108,18 +116,30 @@ public class Play extends JFrame {
 		targetImageLabel.setBounds(620, 110, 275, 270);
 		contentPane.add(targetImageLabel);
 
-		attackNameLabel = new JLabel("코로 때리기");
+		attackNameLabel = new JLabel("");
 		attackNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		attackNameLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 24));
-		attackNameLabel.setBorder(new LineBorder(Color.BLACK, 2));
+		attackNameLabel.setBorder(null);
 		attackNameLabel.setBounds(395, 200, 180, 65);
 		contentPane.add(attackNameLabel);
 
-		JLabel arrowLabel = new JLabel("▶");
-		arrowLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		arrowLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 80));
-		arrowLabel.setBounds(420, 265, 130, 80);
-		contentPane.add(arrowLabel);
+		arrowButton = new JButton("▶");
+		arrowButton.setHorizontalAlignment(SwingConstants.CENTER);
+		arrowButton.setVerticalAlignment(SwingConstants.CENTER);
+		arrowButton.setFont(new Font("Malgun Gothic", Font.BOLD, 68));
+		arrowButton.setBorderPainted(false);
+		arrowButton.setContentAreaFilled(false);
+		arrowButton.setFocusPainted(false);
+		arrowButton.setOpaque(false);
+		arrowButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+		arrowButton.setBounds(408, 193, 140, 105);
+		contentPane.add(arrowButton);
+
+		arrowButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				playAttack();
+			}
+		});
 
 		attackerNameLabel = new JLabel("코끼리");
 		attackerNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -155,26 +175,20 @@ public class Play extends JFrame {
 		targetProgressBar.setBounds(675, 430, 200, 22);
 		contentPane.add(targetProgressBar);
 
-		attackerDistanceLabel = new JLabel("17 / 30");
-		attackerDistanceLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		attackerDistanceLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 14));
-		attackerDistanceLabel.setBounds(265, 452, 60, 22);
-		contentPane.add(attackerDistanceLabel);
-
-		targetDistanceLabel = new JLabel("15 / 30");
-		targetDistanceLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		targetDistanceLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 14));
-		targetDistanceLabel.setBounds(825, 452, 60, 22);
-		contentPane.add(targetDistanceLabel);
-
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(35, 485, 905, 100);
+		scrollPane.setBorder(new LineBorder(Color.BLACK, 2));
 		contentPane.add(scrollPane);
 
 		logTextArea = new JTextArea();
 		logTextArea.setEditable(false);
-		logTextArea.setFont(new Font("Malgun Gothic", Font.PLAIN, 18));
-		logTextArea.setText("코끼리 공격(코로 때리기) -> 기린 거리 17 -> 15");
+		logTextArea.setBackground(Color.WHITE);
+		logTextArea.setForeground(Color.BLACK);
+		logTextArea.setCaretColor(Color.BLACK);
+		logTextArea.setFont(new Font("Malgun Gothic", Font.PLAIN, 16));
+		logTextArea.setLineWrap(true);
+		logTextArea.setWrapStyleWord(true);
+		logTextArea.setText("");
 		scrollPane.setViewportView(logTextArea);
 
 		closeButton = new JButton("close");
@@ -192,43 +206,81 @@ public class Play extends JFrame {
 		});
 	}
 
+	public void showAttack(String attackerName, int attackerDistance, String targetName,
+			int beforeTargetDistance, int afterTargetDistance) {
+		setBattleInfo("공격이 발생했습니다.", attackerName, targetName,
+				getAttackName(attackerName), attackerDistance, beforeTargetDistance, afterTargetDistance);
+	}
+
+	public void showPlayerAttack(String selectedAnimalName, int selectedDistance, String targetName,
+			int beforeTargetDistance, int afterTargetDistance) {
+		setBattleInfo("내 캐릭터가 공격했습니다.", selectedAnimalName, targetName,
+				getAttackName(selectedAnimalName), selectedDistance, beforeTargetDistance, afterTargetDistance);
+	}
+
+	public void showPlayerAttack(String selectedAnimalName, int selectedDistance, String targetName, String attackName,
+			int beforeTargetDistance, int afterTargetDistance) {
+		setBattleInfo("내 캐릭터가 공격했습니다.", selectedAnimalName, targetName,
+				attackName, selectedDistance, beforeTargetDistance, afterTargetDistance);
+	}
+
 	public void showPlayerAttack(String selectedAnimalName, String targetName, String attackName,
 			int beforeTargetDistance, int afterTargetDistance) {
 		setBattleInfo("내 캐릭터가 공격했습니다.", selectedAnimalName, targetName,
-				attackName, beforeTargetDistance, afterTargetDistance);
+				attackName, beforeTargetDistance, beforeTargetDistance, afterTargetDistance);
+	}
+
+	public void showEnemyAttack(String randomAnimalName, int randomAnimalDistance, String selectedAnimalName,
+			int beforeSelectedDistance, int afterSelectedDistance) {
+		setBattleInfo("내 캐릭터가 공격받았습니다.", randomAnimalName, selectedAnimalName,
+				getAttackName(randomAnimalName), randomAnimalDistance, beforeSelectedDistance, afterSelectedDistance);
+	}
+
+	public void showEnemyAttack(String randomAnimalName, int randomAnimalDistance, String selectedAnimalName,
+			String attackName, int beforeSelectedDistance, int afterSelectedDistance) {
+		setBattleInfo("내 캐릭터가 공격받았습니다.", randomAnimalName, selectedAnimalName,
+				attackName, randomAnimalDistance, beforeSelectedDistance, afterSelectedDistance);
 	}
 
 	public void showEnemyAttack(String randomAnimalName, String selectedAnimalName, String attackName,
 			int beforeSelectedDistance, int afterSelectedDistance) {
 		setBattleInfo("내 캐릭터가 공격받았습니다.", randomAnimalName, selectedAnimalName,
-				attackName, beforeSelectedDistance, afterSelectedDistance);
+				attackName, beforeSelectedDistance, beforeSelectedDistance, afterSelectedDistance);
 	}
 
 	public void setBattleInfo(String situationMessage, String attackerName, String targetName, String attackName,
-			int beforeTargetDistance, int afterTargetDistance) {
-		int attackerDistance = Math.max(0, Math.min(MAX_DISTANCE, beforeTargetDistance));
-		int targetDistance = Math.max(0, Math.min(MAX_DISTANCE, afterTargetDistance));
+			int attackerDistanceValue, int beforeTargetDistance, int afterTargetDistance) {
+		int attackerDistance = Math.max(0, Math.min(MAX_DISTANCE, attackerDistanceValue));
+		int beforeDistance = Math.max(0, Math.min(MAX_DISTANCE, beforeTargetDistance));
+
+		pendingSituationMessage = situationMessage;
+		pendingAttackerName = attackerName;
+		pendingTargetName = targetName;
+		pendingAttackName = attackName;
+		pendingBeforeTargetDistance = beforeTargetDistance;
+		pendingAfterTargetDistance = afterTargetDistance;
+		attackFinished = false;
 
 		setTitle("공격 장면 - " + situationMessage);
 		attackerNameLabel.setText(attackerName);
 		targetNameLabel.setText(targetName);
-		attackNameLabel.setText(attackName);
+		attackNameLabel.setText("");
 		setImage(attackerImageLabel, getAttackImagePath(attackerName), attackerName + " 공격");
 		setImage(targetImageLabel, getHitImagePath(targetName), targetName + " 피격");
 		attackerProgressBar.setValue(attackerDistance);
-		targetProgressBar.setValue(targetDistance);
+		targetProgressBar.setValue(beforeDistance);
 		attackerProgressBar.setString(attackerDistance + " / " + MAX_DISTANCE);
-		targetProgressBar.setString(targetDistance + " / " + MAX_DISTANCE);
-		attackerDistanceLabel.setText(attackerDistance + " / " + MAX_DISTANCE);
-		targetDistanceLabel.setText(targetDistance + " / " + MAX_DISTANCE);
-		logTextArea.setText(situationMessage + "\n" + attackerName + " 공격(" + attackName + ") -> "
-				+ targetName + " 거리 " + beforeTargetDistance + " -> " + afterTargetDistance);
+		targetProgressBar.setString(beforeDistance + " / " + MAX_DISTANCE);
+		arrowButton.setEnabled(true);
+		clearConsole();
+		appendConsoleMessage(attackerName + "이(가) " + targetName + "을(를) 공격하려고 합니다.");
+		appendConsoleMessage("가운데 화살표 버튼을 누르면 공격이 실행됩니다.");
 	}
 
 	public void setBattleInfo(String attackerName, String targetName, String attackName,
 			int beforeTargetDistance, int afterTargetDistance) {
 		setBattleInfo("공격이 발생했습니다.", attackerName, targetName,
-				attackName, beforeTargetDistance, afterTargetDistance);
+				attackName, beforeTargetDistance, beforeTargetDistance, afterTargetDistance);
 	}
 
 	private void setImage(JLabel label, String imagePath, String fallbackText) {
@@ -253,4 +305,52 @@ public class Play extends JFrame {
 	private String getHitImagePath(String animalName) {
 		return HIT_IMAGE_DIR + File.separator + animalName + "공격받음.png";
 	}
+
+	public void clearConsole() {
+		logTextArea.setText("");
+	}
+
+	public void appendConsoleMessage(String message) {
+		if (logTextArea.getText().length() > 0) {
+			logTextArea.append("\n");
+		}
+		logTextArea.append(message);
+		logTextArea.setCaretPosition(logTextArea.getDocument().getLength());
+	}
+
+	private void playAttack() {
+		if (attackFinished) {
+			return;
+		}
+
+		int afterDistance = Math.max(0, Math.min(MAX_DISTANCE, pendingAfterTargetDistance));
+		targetProgressBar.setValue(afterDistance);
+		targetProgressBar.setString(afterDistance + " / " + MAX_DISTANCE);
+		appendConsoleMessage(pendingSituationMessage);
+		appendConsoleMessage(pendingAttackerName + " 공격(" + pendingAttackName + ") : "
+				+ pendingTargetName + " 거리 " + pendingBeforeTargetDistance + " -> " + pendingAfterTargetDistance);
+		attackFinished = true;
+		arrowButton.setEnabled(false);
+	}
+
+	private String getAttackName(String animalName) {
+		if ("코끼리".equals(animalName)) {
+			return "코로 때리기";
+		}
+		if ("기린".equals(animalName)) {
+			return "꼬리로 때리기";
+		}
+		if ("원숭이".equals(animalName)) {
+			return "바나나 껍질 던지기";
+		}
+		if ("타조".equals(animalName)) {
+			return "부리로 쪼기";
+		}
+		if ("알파카".equals(animalName)) {
+			return "침뱉기";
+		}
+		return DEFAULT_ATTACK_NAME;
+	}
 }
+
+
