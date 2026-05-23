@@ -3,9 +3,12 @@ package 혜주;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,6 +23,10 @@ import javax.swing.border.LineBorder;
 public class Play extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final int MAX_DISTANCE = 30;
+	private static final String ATTACK_IMAGE_DIR = "src" + File.separator + "혜주"
+			+ File.separator + "images" + File.separator + "attack";
+	private static final String HIT_IMAGE_DIR = "src" + File.separator + "혜주"
+			+ File.separator + "images" + File.separator + "hit";
 
 	private JPanel contentPane;
 	private JFrame mainFrame;
@@ -58,7 +65,7 @@ public class Play extends JFrame {
 	public Play(JFrame mainFrame) {
 		this.mainFrame = mainFrame;
 		initialize();
-		setBattleInfo("코끼리", "기린", "코로 때리기", 17, 15);
+		showPlayerAttack("코끼리", "기린", "코로 때리기", 17, 15);
 	}
 
 	private void initialize() {
@@ -185,23 +192,65 @@ public class Play extends JFrame {
 		});
 	}
 
-	public void setBattleInfo(String attackerName, String targetName, String attackName,
+	public void showPlayerAttack(String selectedAnimalName, String targetName, String attackName,
+			int beforeTargetDistance, int afterTargetDistance) {
+		setBattleInfo("내 캐릭터가 공격했습니다.", selectedAnimalName, targetName,
+				attackName, beforeTargetDistance, afterTargetDistance);
+	}
+
+	public void showEnemyAttack(String randomAnimalName, String selectedAnimalName, String attackName,
+			int beforeSelectedDistance, int afterSelectedDistance) {
+		setBattleInfo("내 캐릭터가 공격받았습니다.", randomAnimalName, selectedAnimalName,
+				attackName, beforeSelectedDistance, afterSelectedDistance);
+	}
+
+	public void setBattleInfo(String situationMessage, String attackerName, String targetName, String attackName,
 			int beforeTargetDistance, int afterTargetDistance) {
 		int attackerDistance = Math.max(0, Math.min(MAX_DISTANCE, beforeTargetDistance));
 		int targetDistance = Math.max(0, Math.min(MAX_DISTANCE, afterTargetDistance));
 
+		setTitle("공격 장면 - " + situationMessage);
 		attackerNameLabel.setText(attackerName);
 		targetNameLabel.setText(targetName);
 		attackNameLabel.setText(attackName);
-		attackerImageLabel.setText(attackerName + " 공격");
-		targetImageLabel.setText(targetName + " 피격");
+		setImage(attackerImageLabel, getAttackImagePath(attackerName), attackerName + " 공격");
+		setImage(targetImageLabel, getHitImagePath(targetName), targetName + " 피격");
 		attackerProgressBar.setValue(attackerDistance);
 		targetProgressBar.setValue(targetDistance);
 		attackerProgressBar.setString(attackerDistance + " / " + MAX_DISTANCE);
 		targetProgressBar.setString(targetDistance + " / " + MAX_DISTANCE);
 		attackerDistanceLabel.setText(attackerDistance + " / " + MAX_DISTANCE);
 		targetDistanceLabel.setText(targetDistance + " / " + MAX_DISTANCE);
-		logTextArea.setText(attackerName + " 공격(" + attackName + ") -> "
+		logTextArea.setText(situationMessage + "\n" + attackerName + " 공격(" + attackName + ") -> "
 				+ targetName + " 거리 " + beforeTargetDistance + " -> " + afterTargetDistance);
+	}
+
+	public void setBattleInfo(String attackerName, String targetName, String attackName,
+			int beforeTargetDistance, int afterTargetDistance) {
+		setBattleInfo("공격이 발생했습니다.", attackerName, targetName,
+				attackName, beforeTargetDistance, afterTargetDistance);
+	}
+
+	private void setImage(JLabel label, String imagePath, String fallbackText) {
+		File imageFile = new File(imagePath);
+		if (!imageFile.exists()) {
+			label.setIcon(null);
+			label.setText(fallbackText);
+			return;
+		}
+
+		ImageIcon originalIcon = new ImageIcon(imagePath);
+		Image scaledImage = originalIcon.getImage().getScaledInstance(
+				label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
+		label.setText("");
+		label.setIcon(new ImageIcon(scaledImage));
+	}
+
+	private String getAttackImagePath(String animalName) {
+		return ATTACK_IMAGE_DIR + File.separator + animalName + "공격.png";
+	}
+
+	private String getHitImagePath(String animalName) {
+		return HIT_IMAGE_DIR + File.separator + animalName + "공격받음.png";
 	}
 }
