@@ -73,7 +73,6 @@ public class Play extends JFrame {
 	public Play(JFrame mainFrame) {
 		this.mainFrame = mainFrame;
 		initialize();
-		showAttack("코끼리", 17, "기린", 17, 15);
 	}
 
 	private void initialize() {

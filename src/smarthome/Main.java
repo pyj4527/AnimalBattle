@@ -343,7 +343,7 @@ public class Main extends JFrame {
 			return;
 		}
 
-		attack(me, target);
+		attack(me, target, true);
 		finishMyItemAndRunOthers();
 	}
 
@@ -375,7 +375,7 @@ public class Main extends JFrame {
 		if (random.nextBoolean()) {
 			Player target = chooseAttackTarget(attacker);
 			if (target != null) {
-				attack(attacker, target);
+				attack(attacker, target, false);
 			}
 		} else {
 			useBooster(attacker);
@@ -395,11 +395,15 @@ public class Main extends JFrame {
 		return targets.get(random.nextInt(targets.size()));
 	}
 
-	private void attack(Player attacker, Player target) {
+	private void attack(Player attacker, Player target, boolean showAttackFrame) {
+		int beforeTargetDistance = target.distance;
 		target.distance = Math.max(0, target.distance - ITEM_DISTANCE);
 		target.displayDistance = target.distance;
-		if (!openFrameIfAvailable("smarthome.Play")) {
-			openAttackPage(attacker, target);
+		if (showAttackFrame) {
+			Play attackFrame = new Play(this);
+			attackFrame.showAttack(attacker.name, attacker.distance, target.name,
+					beforeTargetDistance, target.distance);
+			attackFrame.setVisible(true);
 		}
 		refreshScreen();
 	}
