@@ -64,21 +64,32 @@ public class 패배엔딩 extends JFrame {
 		pack();
 		setLocationRelativeTo(null);
 
+		메인메뉴.addActionListener(e -> {
+			new start().setVisible(true);
+			dispose();
+		});
+
 		setLoseAnimalImage(animalName);
 	}
 
 	private void setLoseAnimalImage(String animalName) {
 		JLabel 동물패배사진 = (JLabel) contentPane.getComponent(0);
 		if ("코끼리".equals(animalName)) {
-			동물패배사진.setIcon(new ImageIcon("src/채연/코끼리.jpg"));
+			setScaledImage(동물패배사진, "src/채연/코끼리.jpg");
 		} else if ("원숭이".equals(animalName)) {
-			동물패배사진.setIcon(new ImageIcon("src/채연/원숭이.jpg"));
+			setScaledImage(동물패배사진, "src/채연/원숭이.jpg");
 		} else if ("타조".equals(animalName)) {
-			동물패배사진.setIcon(new ImageIcon("src/채연/타조.jpg"));
+			setScaledImage(동물패배사진, "src/채연/타조.jpg");
 		} else if ("기린".equals(animalName)) {
-			동물패배사진.setIcon(new ImageIcon("src/채연/기린.jpg"));
+			setScaledImage(동물패배사진, "src/채연/기린.jpg");
 		} else if ("알파카".equals(animalName)) {
-			동물패배사진.setIcon(new ImageIcon("src/채연/알파카.jpg"));
+			setScaledImage(동물패배사진, "src/채연/알파카.jpg");
 		}
+	}
+
+	private void setScaledImage(JLabel label, String imagePath) {
+		ImageIcon icon = new ImageIcon(imagePath);
+		Image image = icon.getImage().getScaledInstance(label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
+		label.setIcon(new ImageIcon(image));
 	}
 }

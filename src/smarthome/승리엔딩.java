@@ -63,15 +63,21 @@ public class 승리엔딩 extends JFrame {
 	private void setWinAnimalImage(String animalName) {
 		JLabel 동물승리사진 = (JLabel) contentPane.getComponent(0);
 		if ("코끼리".equals(animalName)) {
-			동물승리사진.setIcon(new ImageIcon("src/채연/코끼리세레머니.jpg"));
+			setScaledImage(동물승리사진, "src/채연/코끼리세레머니.jpg");
 		} else if ("원숭이".equals(animalName)) {
-			동물승리사진.setIcon(new ImageIcon("src/채연/원숭이세레머니.jpg"));
+			setScaledImage(동물승리사진, "src/채연/원숭이세레머니.jpg");
 		} else if ("타조".equals(animalName)) {
-			동물승리사진.setIcon(new ImageIcon("src/채연/타조세레머니.jpg"));
+			setScaledImage(동물승리사진, "src/채연/타조세레머니.jpg");
 		} else if ("기린".equals(animalName)) {
-			동물승리사진.setIcon(new ImageIcon("src/채연/기린세레머니.jpg"));
+			setScaledImage(동물승리사진, "src/채연/기린세레머니.jpg");
 		} else if ("알파카".equals(animalName)) {
-			동물승리사진.setIcon(new ImageIcon("src/채연/알파카세레머니.jpg"));
+			setScaledImage(동물승리사진, "src/채연/알파카세레머니.jpg");
 		}
+	}
+
+	private void setScaledImage(JLabel label, String imagePath) {
+		ImageIcon icon = new ImageIcon(imagePath);
+		Image image = icon.getImage().getScaledInstance(label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
+		label.setIcon(new ImageIcon(image));
 	}
 }
