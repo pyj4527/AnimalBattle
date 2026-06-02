@@ -52,6 +52,7 @@ public class Play extends JFrame {
 	private int pendingBeforeTargetDistance;
 	private int pendingAfterTargetDistance;
 	private boolean attackFinished;
+	private Runnable attackAction;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -282,6 +283,10 @@ public class Play extends JFrame {
 				attackName, beforeTargetDistance, beforeTargetDistance, afterTargetDistance);
 	}
 
+	public void setAttackAction(Runnable attackAction) {
+		this.attackAction = attackAction;
+	}
+
 	private void setImage(JLabel label, String imagePath, String fallbackText) {
 		File imageFile = new File(imagePath);
 		if (!imageFile.exists()) {
@@ -328,6 +333,9 @@ public class Play extends JFrame {
 		appendConsoleMessage(pendingSituationMessage);
 		appendConsoleMessage(pendingAttackerName + " 공격(" + pendingAttackName + ") : "
 				+ pendingTargetName + " 거리 " + pendingBeforeTargetDistance + " -> " + pendingAfterTargetDistance);
+		if (attackAction != null) {
+			attackAction.run();
+		}
 		attackFinished = true;
 		arrowButton.setEnabled(false);
 	}

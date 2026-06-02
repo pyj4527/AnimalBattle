@@ -5,7 +5,10 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
@@ -34,7 +38,8 @@ public class Main extends JFrame {
 	private static final int ITEM_DISTANCE = 2;
 	private static final int DICE_MIN = 1;
 	private static final int DICE_MAX = 6;
-	private static final int RIVAL_COUNT = 4;
+	private static final int PLAYER_COUNT = 5;
+	private static final String MAIN_BACKGROUND_IMAGE_PATH = "src/채연/시작화면.png";
 
 	private final JPanel contentPane;
 	private final Random random = new Random();
@@ -43,18 +48,23 @@ public class Main extends JFrame {
 	private final List<PlayerView> rivalViews = new ArrayList<PlayerView>();
 
 	private Player me;
-	private JLabel myImageLabel;
-	private JLabel myNameValueLabel;
-	private JLabel myDistanceValueLabel;
+	private JLabel currentImageLabel;
+	private JLabel currentNameValueLabel;
+	private JLabel currentDistanceValueLabel;
+	private JTextArea actionMessageTextArea;
+	private JLabel targetGuideLabel;
+	private JLabel targetHintLabel;
 	private JLabel turnInfoLabel;
-	private JProgressBar courseProgressBar;
 	private JButton attackButton;
 	private JButton boosterButton;
 	private JButton rollButton;
 	private JButton resetButton;
 	private JComboBox<Player> targetComboBox;
 	private JPanel rivalsPanel;
+	private JPanel itemActionPanel;
+	private JPanel itemMessagePanel;
 	private boolean itemPhase;
+	private int itemUserIndex;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -76,8 +86,8 @@ public class Main extends JFrame {
 	public Main(List<?> selectedPlayers) {
 		setTitle("공격 대상 선택");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 844, 631);
-		contentPane = new JPanel();
+		setBounds(100, 100, 1250, 770);
+		contentPane = new BackgroundPanel(MAIN_BACKGROUND_IMAGE_PATH);
 		contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
@@ -97,7 +107,7 @@ public class Main extends JFrame {
 			}
 		}
 
-		while (players.size() < RIVAL_COUNT + 1) {
+		while (players.size() < PLAYER_COUNT) {
 			players.add(new Player("플레이어" + players.size(), null));
 		}
 
@@ -105,23 +115,25 @@ public class Main extends JFrame {
 	}
 
 	private void createLayout() {
-		JPanel myPanel = new JPanel();
-		myPanel.setLayout(null);
-		myPanel.setBorder(BorderFactory.createTitledBorder("내 캐릭터"));
-		myPanel.setBounds(12, 10, 249, 463);
-		contentPane.add(myPanel);
+		JPanel itemTurnPanel = new JPanel();
+		itemTurnPanel.setLayout(null);
+		itemTurnPanel.setBorder(BorderFactory.createTitledBorder("현재 플레이어"));
+		itemTurnPanel.setBounds(12, 10, 249, 646);
+		itemTurnPanel.setOpaque(false);
+		contentPane.add(itemTurnPanel);
 
-		myImageLabel = new JLabel();
-		myImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		myImageLabel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-		myImageLabel.setBounds(52, 35, 140, 138);
-		myPanel.add(myImageLabel);
+		currentImageLabel = new JLabel();
+		currentImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		currentImageLabel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+		currentImageLabel.setBounds(52, 35, 140, 138);
+		itemTurnPanel.add(currentImageLabel);
 
 		JPanel infoPanel = new JPanel();
 		infoPanel.setLayout(null);
-		infoPanel.setBorder(BorderFactory.createTitledBorder("내 정보"));
+		infoPanel.setBorder(BorderFactory.createTitledBorder("플레이어 정보"));
 		infoPanel.setBounds(12, 195, 225, 108);
-		myPanel.add(infoPanel);
+		infoPanel.setOpaque(false);
+		itemTurnPanel.add(infoPanel);
 
 		JLabel nameLabel = new JLabel("이름");
 		nameLabel.setBounds(18, 38, 49, 15);
@@ -131,75 +143,97 @@ public class Main extends JFrame {
 		distanceLabel.setBounds(18, 66, 49, 15);
 		infoPanel.add(distanceLabel);
 
-		myNameValueLabel = new JLabel();
-		myNameValueLabel.setBounds(77, 38, 130, 15);
-		infoPanel.add(myNameValueLabel);
+		currentNameValueLabel = new JLabel();
+		currentNameValueLabel.setBounds(77, 38, 130, 15);
+		infoPanel.add(currentNameValueLabel);
 
-		myDistanceValueLabel = new JLabel();
-		myDistanceValueLabel.setBounds(77, 66, 130, 15);
-		infoPanel.add(myDistanceValueLabel);
+		currentDistanceValueLabel = new JLabel();
+		currentDistanceValueLabel.setBounds(77, 66, 130, 15);
+		infoPanel.add(currentDistanceValueLabel);
+
+		itemActionPanel = new JPanel();
+		itemActionPanel.setLayout(null);
+		itemActionPanel.setBounds(12, 324, 225, 260);
+		itemActionPanel.setOpaque(false);
+		itemTurnPanel.add(itemActionPanel);
 
 		attackButton = new JButton("공격하기");
-		attackButton.setBounds(22, 324, 90, 63);
+		attackButton.setBounds(10, 0, 90, 55);
 		attackButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				attackByMe();
 			}
 		});
-		myPanel.add(attackButton);
+		itemActionPanel.add(attackButton);
 
 		boosterButton = new JButton("부스터 사용");
-		boosterButton.setBounds(123, 324, 100, 63);
+		boosterButton.setBounds(111, 0, 104, 55);
 		boosterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				useBooster(me);
 			}
 		});
-		myPanel.add(boosterButton);
+		itemActionPanel.add(boosterButton);
+
+		targetGuideLabel = new JLabel("공격 대상을 선택해 주세요");
+		targetGuideLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		targetGuideLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 13));
+		targetGuideLabel.setBounds(10, 74, 205, 20);
+		itemActionPanel.add(targetGuideLabel);
 
 		targetComboBox = new JComboBox<Player>();
-		targetComboBox.setBounds(52, 401, 167, 22);
-		myPanel.add(targetComboBox);
+		targetComboBox.setBounds(10, 102, 205, 28);
+		itemActionPanel.add(targetComboBox);
+		targetComboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Player target = (Player) targetComboBox.getSelectedItem();
+				targetHintLabel.setText(target == null ? "선택" : target.name);
+			}
+		});
 
-		JLabel courseTitleLabel = new JLabel("코스");
-		courseTitleLabel.setBounds(273, 10, 49, 14);
-		contentPane.add(courseTitleLabel);
+		JPanel selectedTargetPanel = new JPanel();
+		selectedTargetPanel.setLayout(new BorderLayout());
+		selectedTargetPanel.setBounds(10, 144, 205, 53);
+		selectedTargetPanel.setBorder(BorderFactory.createTitledBorder("선택한 공격 대상"));
+		selectedTargetPanel.setOpaque(false);
+		itemActionPanel.add(selectedTargetPanel);
 
-		JPanel coursePanel = new JPanel();
-		coursePanel.setLayout(null);
-		coursePanel.setBounds(273, 29, 545, 91);
-		contentPane.add(coursePanel);
+		targetHintLabel = new JLabel("선택", SwingConstants.CENTER);
+		selectedTargetPanel.add(targetHintLabel, BorderLayout.CENTER);
 
-		courseProgressBar = new JProgressBar(0, GOAL_DISTANCE);
-		courseProgressBar.setStringPainted(true);
-		courseProgressBar.setBounds(32, 38, 480, 27);
-		coursePanel.add(courseProgressBar);
+		itemMessagePanel = new JPanel();
+		itemMessagePanel.setLayout(new BorderLayout());
+		itemMessagePanel.setBounds(12, 324, 225, 260);
+		itemMessagePanel.setBorder(BorderFactory.createTitledBorder("진행 안내"));
+		itemMessagePanel.setOpaque(false);
+		itemTurnPanel.add(itemMessagePanel);
 
-		JLabel startLabel = new JLabel("0");
-		startLabel.setBounds(32, 14, 49, 14);
-		coursePanel.add(startLabel);
-
-		JLabel endLabel = new JLabel(String.valueOf(GOAL_DISTANCE));
-		endLabel.setBounds(484, 14, 49, 14);
-		coursePanel.add(endLabel);
+		actionMessageTextArea = new JTextArea();
+		actionMessageTextArea.setEditable(false);
+		actionMessageTextArea.setOpaque(false);
+		actionMessageTextArea.setLineWrap(true);
+		actionMessageTextArea.setWrapStyleWord(true);
+		actionMessageTextArea.setFont(new Font("Malgun Gothic", Font.BOLD, 15));
+		actionMessageTextArea.setFocusable(false);
+		itemMessagePanel.add(actionMessageTextArea, BorderLayout.CENTER);
 
 		turnInfoLabel = new JLabel("주사위를 굴려주세요.");
 		turnInfoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		turnInfoLabel.setBounds(510, 10, 308, 14);
-		contentPane.add(turnInfoLabel);
+		turnInfoLabel.setBounds(850, 10, 364, 14);
 
-		JLabel rivalsTitleLabel = new JLabel("다른 플레이어");
-		rivalsTitleLabel.setBounds(273, 128, 160, 14);
+		JLabel rivalsTitleLabel = new JLabel("전체 플레이어");
+		rivalsTitleLabel.setBounds(273, 10, 160, 14);
 		contentPane.add(rivalsTitleLabel);
 
 		rivalsPanel = new JPanel();
 		rivalsPanel.setLayout(null);
-		rivalsPanel.setBounds(273, 152, 545, 432);
+		rivalsPanel.setBounds(273, 34, 944, 622);
+		rivalsPanel.setOpaque(false);
 		contentPane.add(rivalsPanel);
 		createRivalViews();
 
 		rollButton = new JButton("주사위 굴리기");
-		rollButton.setBounds(124, 493, 127, 37);
+		rollButton.setBounds(12, 676, 127, 37);
 		rollButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				rollDiceTurn();
@@ -208,28 +242,13 @@ public class Main extends JFrame {
 		contentPane.add(rollButton);
 
 		resetButton = new JButton("초기화");
-		resetButton.setBounds(124, 540, 127, 37);
+		resetButton.setBounds(149, 676, 105, 37);
 		resetButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				resetGame();
 			}
 		});
 		contentPane.add(resetButton);
-
-		JPanel selectedTargetPanel = new JPanel();
-		selectedTargetPanel.setLayout(new BorderLayout());
-		selectedTargetPanel.setBounds(22, 483, 90, 101);
-		selectedTargetPanel.setBorder(BorderFactory.createTitledBorder("타겟"));
-		contentPane.add(selectedTargetPanel);
-
-		JLabel targetHintLabel = new JLabel("선택", SwingConstants.CENTER);
-		selectedTargetPanel.add(targetHintLabel, BorderLayout.CENTER);
-		targetComboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Player target = (Player) targetComboBox.getSelectedItem();
-				targetHintLabel.setText(target == null ? "선택" : target.name);
-			}
-		});
 
 		setMyItemButtonsEnabled(false);
 	}
@@ -240,15 +259,12 @@ public class Main extends JFrame {
 
 		int addedCount = 0;
 		for (Player player : players) {
-			if (player == me) {
-				continue;
-			}
 			PlayerView view = new PlayerView(player);
-			view.panel.setBounds(0, addedCount * 86, 545, 82);
+			view.panel.setBounds(0, addedCount * 84, 944, 80);
 			rivalViews.add(view);
 			rivalsPanel.add(view.panel);
 			addedCount++;
-			if (addedCount == RIVAL_COUNT) {
+			if (addedCount == PLAYER_COUNT) {
 				break;
 			}
 		}
@@ -314,23 +330,44 @@ public class Main extends JFrame {
 	}
 
 	private void runItemPhase() {
-		setMyItemButtonsEnabled(currentItemUsers.contains(me));
+		itemUserIndex = 0;
+		processCurrentItemUser();
+	}
 
-		for (Player player : currentItemUsers) {
-			if (player == me) {
-				turnInfoLabel.setText("내 아이템을 선택하세요.");
-				return;
-			}
-
-			useRandomItem(player);
-			Player winner = findWinner();
-			if (winner != null) {
-				openResultPage(winner);
-				return;
-			}
+	private void processCurrentItemUser() {
+		if (!itemPhase || itemUserIndex >= currentItemUsers.size()) {
+			finishItemPhase();
+			return;
 		}
 
-		finishItemPhase();
+		Player player = currentItemUsers.get(itemUserIndex);
+		showCurrentItemPlayer(player);
+
+		if (player == me) {
+			turnInfoLabel.setText("내 아이템을 선택하세요.");
+			setMyItemButtonsEnabled(true);
+			return;
+		}
+
+		setMyItemButtonsEnabled(false);
+		String actionMessage = useRandomItem(player);
+		showItemMessage(actionMessage);
+
+		Player winner = findWinner();
+		if (winner != null) {
+			openResultPage(winner);
+			return;
+		}
+
+		Timer nextPlayerTimer = new Timer(1000, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				((Timer) e.getSource()).stop();
+				itemUserIndex++;
+				processCurrentItemUser();
+			}
+		});
+		nextPlayerTimer.setRepeats(false);
+		nextPlayerTimer.start();
 	}
 
 	private void attackByMe() {
@@ -343,43 +380,31 @@ public class Main extends JFrame {
 			return;
 		}
 
-		attack(me, target, true);
-		finishMyItemAndRunOthers();
+		setMyItemButtonsEnabled(false);
+		attack(me, target, true, new Runnable() {
+			public void run() {
+				itemUserIndex++;
+				processCurrentItemUser();
+			}
+		});
 	}
 
 	private void finishMyItemAndRunOthers() {
 		setMyItemButtonsEnabled(false);
-		boolean afterMe = false;
-
-		for (Player player : currentItemUsers) {
-			if (player == me) {
-				afterMe = true;
-				continue;
-			}
-			if (!afterMe) {
-				continue;
-			}
-
-			useRandomItem(player);
-			Player winner = findWinner();
-			if (winner != null) {
-				openResultPage(winner);
-				return;
-			}
-		}
-
-		finishItemPhase();
+		itemUserIndex++;
+		processCurrentItemUser();
 	}
 
-	private void useRandomItem(Player attacker) {
+	private String useRandomItem(Player attacker) {
 		if (random.nextBoolean()) {
 			Player target = chooseAttackTarget(attacker);
 			if (target != null) {
 				attack(attacker, target, false);
+				return attacker.name + "가 " + target.name + "을(를) 공격합니다.";
 			}
-		} else {
-			useBooster(attacker);
 		}
+		useBooster(attacker);
+		return attacker.name + "가 부스터를 선택했습니다. 2칸 앞으로 갑니다.";
 	}
 
 	private Player chooseAttackTarget(Player attacker) {
@@ -396,15 +421,43 @@ public class Main extends JFrame {
 	}
 
 	private void attack(Player attacker, Player target, boolean showAttackFrame) {
+		attack(attacker, target, showAttackFrame, null);
+	}
+
+	private void attack(Player attacker, Player target, boolean showAttackFrame, Runnable afterAttackFrameClosed) {
 		int beforeTargetDistance = target.distance;
-		target.distance = Math.max(0, target.distance - ITEM_DISTANCE);
-		target.displayDistance = target.distance;
+		int afterTargetDistance = Math.max(0, target.distance - ITEM_DISTANCE);
 		if (showAttackFrame) {
 			Play attackFrame = new Play(this);
 			attackFrame.showAttack(attacker.name, attacker.distance, target.name,
-					beforeTargetDistance, target.distance);
+					beforeTargetDistance, afterTargetDistance);
+			attackFrame.setAttackAction(new Runnable() {
+				public void run() {
+					applyAttackResult(target, afterTargetDistance);
+					Player winner = findWinner();
+					if (winner != null) {
+						openResultPage(winner);
+					}
+				}
+			});
+			if (afterAttackFrameClosed != null) {
+				attackFrame.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent e) {
+						if (itemPhase) {
+							afterAttackFrameClosed.run();
+						}
+					}
+				});
+			}
 			attackFrame.setVisible(true);
+		} else {
+			applyAttackResult(target, afterTargetDistance);
 		}
+	}
+
+	private void applyAttackResult(Player target, int afterTargetDistance) {
+		target.distance = afterTargetDistance;
+		target.displayDistance = target.distance;
 		refreshScreen();
 	}
 
@@ -422,13 +475,42 @@ public class Main extends JFrame {
 	private void finishItemPhase() {
 		itemPhase = false;
 		currentItemUsers.clear();
+		itemUserIndex = 0;
 		setMyItemButtonsEnabled(false);
+		clearCurrentItemPlayer();
 		turnInfoLabel.setText("턴 종료. 주사위를 굴려주세요.");
 
 		Player winner = findWinner();
 		if (winner != null) {
 			openResultPage(winner);
 		}
+	}
+
+	private void showCurrentItemPlayer(Player player) {
+		setPlayerImage(currentImageLabel, player, 140, 138);
+		currentNameValueLabel.setText(player.name);
+		currentDistanceValueLabel.setText(player.distance + " / " + GOAL_DISTANCE);
+	}
+
+	private void clearCurrentItemPlayer() {
+		currentImageLabel.setIcon(null);
+		currentImageLabel.setText("");
+		currentNameValueLabel.setText("");
+		currentDistanceValueLabel.setText("");
+		actionMessageTextArea.setText("");
+		targetHintLabel.setText("선택");
+		showMyItemControls(false);
+	}
+
+	private void showMyItemControls(boolean visible) {
+		itemActionPanel.setVisible(visible);
+		itemMessagePanel.setVisible(!visible);
+	}
+
+	private void showItemMessage(String message) {
+		actionMessageTextArea.setText(message);
+		actionMessageTextArea.setCaretPosition(0);
+		showMyItemControls(false);
 	}
 
 	private void animateProgressBars(Runnable afterAnimation) {
@@ -538,12 +620,6 @@ public class Main extends JFrame {
 	}
 
 	private void refreshScreen() {
-		setPlayerImage(myImageLabel, me, 140, 138);
-		myNameValueLabel.setText(me.name);
-		myDistanceValueLabel.setText(me.distance + " / " + GOAL_DISTANCE);
-		courseProgressBar.setValue(me.displayDistance);
-		courseProgressBar.setString(me.displayDistance + " / " + GOAL_DISTANCE);
-
 		Object selectedTarget = targetComboBox.getSelectedItem();
 		DefaultComboBoxModel<Player> comboModel = new DefaultComboBoxModel<Player>();
 		for (Player player : players) {
@@ -559,6 +635,11 @@ public class Main extends JFrame {
 		for (PlayerView view : rivalViews) {
 			view.refresh();
 		}
+
+		if (itemPhase && itemUserIndex < currentItemUsers.size()) {
+			Player currentPlayer = currentItemUsers.get(itemUserIndex);
+			currentDistanceValueLabel.setText(currentPlayer.distance + " / " + GOAL_DISTANCE);
+		}
 	}
 
 	private void setMyItemButtonsEnabled(boolean enabled) {
@@ -566,6 +647,7 @@ public class Main extends JFrame {
 		boosterButton.setEnabled(enabled);
 		targetComboBox.setEnabled(enabled);
 		rollButton.setEnabled(!enabled && !itemPhase);
+		showMyItemControls(enabled);
 	}
 
 	private void setPlayerImage(JLabel label, Player player, int width, int height) {
@@ -604,6 +686,22 @@ public class Main extends JFrame {
 		return null;
 	}
 
+	private static class BackgroundPanel extends JPanel {
+		private static final long serialVersionUID = 1L;
+		private final Image backgroundImage;
+
+		private BackgroundPanel(String imagePath) {
+			backgroundImage = new ImageIcon(imagePath).getImage();
+		}
+
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			if (backgroundImage != null) {
+				g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+			}
+		}
+	}
+
 	private static List<Player> createSamplePlayers() {
 		List<Player> samplePlayers = new ArrayList<Player>();
 		samplePlayers.add(new Player("나", null));
@@ -611,7 +709,6 @@ public class Main extends JFrame {
 		samplePlayers.add(new Player("플레이어2", null));
 		samplePlayers.add(new Player("플레이어3", null));
 		samplePlayers.add(new Player("플레이어4", null));
-		samplePlayers.add(new Player("플레이어5", null));
 		return samplePlayers;
 	}
 
@@ -656,6 +753,7 @@ public class Main extends JFrame {
 			panel = new JPanel();
 			panel.setLayout(null);
 			panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+			panel.setOpaque(false);
 
 			imageLabel = new JLabel();
 			imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -665,17 +763,17 @@ public class Main extends JFrame {
 
 			nameLabel = new JLabel();
 			nameLabel.setFont(new Font("Dialog", Font.BOLD, 13));
-			nameLabel.setBounds(145, 8, 260, 20);
+			nameLabel.setBounds(145, 8, 560, 20);
 			panel.add(nameLabel);
 
 			distanceValueLabel = new JLabel();
 			distanceValueLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-			distanceValueLabel.setBounds(415, 8, 110, 20);
+			distanceValueLabel.setBounds(785, 8, 110, 20);
 			panel.add(distanceValueLabel);
 
 			progressBar = new JProgressBar(0, GOAL_DISTANCE);
 			progressBar.setStringPainted(true);
-			progressBar.setBounds(145, 34, 380, 22);
+			progressBar.setBounds(145, 34, 750, 22);
 			panel.add(progressBar);
 
 			startLabel = new JLabel("0");
@@ -683,7 +781,7 @@ public class Main extends JFrame {
 			panel.add(startLabel);
 
 			endLabel = new JLabel(String.valueOf(GOAL_DISTANCE), SwingConstants.RIGHT);
-			endLabel.setBounds(485, 60, 40, 15);
+			endLabel.setBounds(855, 60, 40, 15);
 			panel.add(endLabel);
 
 			refresh();
