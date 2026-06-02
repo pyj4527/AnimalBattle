@@ -170,7 +170,11 @@ public class Main extends JFrame {
 		boosterButton.setBounds(111, 0, 104, 55);
 		boosterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				useBooster(me);
+				useBooster(me, true, new Runnable() {
+					public void run() {
+						finishMyItemAndRunOthers();
+					}
+				});
 			}
 		});
 		itemActionPanel.add(boosterButton);
@@ -470,6 +474,48 @@ public class Main extends JFrame {
 		if (player == me) {
 			finishMyItemAndRunOthers();
 		}
+	}
+
+	private void useBooster(Player player, boolean showBoosterFrame, Runnable afterBoosterFrameClosed) {
+		if (player == me && (!itemPhase || !boosterButton.isEnabled())) {
+			return;
+		}
+
+		int beforeDistance = player.distance;
+		int afterDistance = Math.min(GOAL_DISTANCE, player.distance + ITEM_DISTANCE);
+		setMyItemButtonsEnabled(false);
+
+		if (showBoosterFrame) {
+			BoosterPlay boosterFrame = new BoosterPlay(this);
+			boosterFrame.showBooster(player.name, beforeDistance, afterDistance);
+			boosterFrame.setBoosterAction(new Runnable() {
+				public void run() {
+					applyBoosterResult(player, afterDistance);
+					Player winner = findWinner();
+					if (winner != null) {
+						openResultPage(winner);
+					}
+				}
+			});
+			if (afterBoosterFrameClosed != null) {
+				boosterFrame.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent e) {
+						if (itemPhase) {
+							afterBoosterFrameClosed.run();
+						}
+					}
+				});
+			}
+			boosterFrame.setVisible(true);
+		} else {
+			applyBoosterResult(player, afterDistance);
+		}
+	}
+
+	private void applyBoosterResult(Player player, int afterDistance) {
+		player.distance = afterDistance;
+		player.displayDistance = player.distance;
+		refreshScreen();
 	}
 
 	private void finishItemPhase() {
