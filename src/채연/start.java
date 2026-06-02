@@ -14,6 +14,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 
+import 여진.Main;
+
 public class start extends JFrame {
 
     private static final long serialVersionUID = 1L;
@@ -69,61 +71,31 @@ public class start extends JFrame {
         contentPane.add(알파카선택);
 
         코끼리선택.addActionListener(e -> {
-            List<Animal> animals = new ArrayList<>();
-            animals.add(new 코끼리());
-            animals.add(new 원숭이());
-            animals.add(new 타조());
-            animals.add(new 기린());
-            animals.add(new 알파카());
-            new Main(animals).setVisible(true);
+            new Main(createPlayers("코끼리", "원숭이", "타조", "기린", "알파카")).setVisible(true);
             dispose();
         });
 
         원숭이선택.addActionListener(e -> {
-            List<Animal> animals = new ArrayList<>();
-            animals.add(new 원숭이());
-            animals.add(new 코끼리());
-            animals.add(new 타조());
-            animals.add(new 기린());
-            animals.add(new 알파카());
-            new Main(animals).setVisible(true);
+            new Main(createPlayers("원숭이", "코끼리", "타조", "기린", "알파카")).setVisible(true);
             dispose();
         });
 
         타조선택.addActionListener(e -> {
-            List<Animal> animals = new ArrayList<>();
-            animals.add(new 타조());
-            animals.add(new 코끼리());
-            animals.add(new 원숭이());
-            animals.add(new 기린());
-            animals.add(new 알파카());
-            new Main(animals).setVisible(true);
+            new Main(createPlayers("타조", "코끼리", "원숭이", "기린", "알파카")).setVisible(true);
             dispose();
         });
 
         기린선택.addActionListener(e -> {
-            List<Animal> animals = new ArrayList<>();
-            animals.add(new 기린());
-            animals.add(new 코끼리());
-            animals.add(new 원숭이());
-            animals.add(new 타조());
-            animals.add(new 알파카());
-            new Main(animals).setVisible(true);
+            new Main(createPlayers("기린", "코끼리", "원숭이", "타조", "알파카")).setVisible(true);
             dispose();
         });
 
         알파카선택.addActionListener(e -> {
-            List<Animal> animals = new ArrayList<>();
-            animals.add(new 알파카());
-            animals.add(new 코끼리());
-            animals.add(new 원숭이());
-            animals.add(new 타조());
-            animals.add(new 기린());
-            new Main(animals).setVisible(true);
+            new Main(createPlayers("알파카", "코끼리", "원숭이", "타조", "기린")).setVisible(true);
             dispose();
         });
 
-        ImageIcon icon = new ImageIcon(start.class.getResource("/smarthome/image/동물레이스.png"));
+        ImageIcon icon = new ImageIcon("src/채연/동물레이스.png");
         Image img = icon.getImage();
         Image changeImg = img.getScaledInstance(600, 420, Image.SCALE_SMOOTH);
 
@@ -133,5 +105,19 @@ public class start extends JFrame {
 
         pack();
         setLocationRelativeTo(null);
+    }
+
+    private List<Main.Player> createPlayers(String first, String second, String third, String fourth, String fifth) {
+        List<Main.Player> players = new ArrayList<>();
+        players.add(createPlayer(first));
+        players.add(createPlayer(second));
+        players.add(createPlayer(third));
+        players.add(createPlayer(fourth));
+        players.add(createPlayer(fifth));
+        return players;
+    }
+
+    private Main.Player createPlayer(String animalName) {
+        return new Main.Player(animalName, "src/채연/" + animalName + ".jpg");
     }
 }

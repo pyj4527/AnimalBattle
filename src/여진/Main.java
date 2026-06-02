@@ -73,7 +73,7 @@ public class Main extends JFrame {
 		this(createSamplePlayers());
 	}
 
-	public Main(List<Player> selectedPlayers) {
+	public Main(List<?> selectedPlayers) {
 		setTitle("공격 대상 선택");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 844, 631);
@@ -87,12 +87,14 @@ public class Main extends JFrame {
 		refreshScreen();
 	}
 
-	private void setPlayers(List<Player> selectedPlayers) {
+	private void setPlayers(List<?> selectedPlayers) {
 		players.clear();
 		if (selectedPlayers == null || selectedPlayers.isEmpty()) {
 			players.addAll(createSamplePlayers());
 		} else {
-			players.addAll(selectedPlayers);
+			for (Object selectedPlayer : selectedPlayers) {
+				players.add(createPlayer(selectedPlayer));
+			}
 		}
 
 		while (players.size() < RIVAL_COUNT + 1) {
@@ -466,12 +468,33 @@ public class Main extends JFrame {
 	}
 
 	private void openResultPage(Player winner) {
-		String title = winner == me ? "위너 페이지" : "루저 페이지";
-		String message = winner == me ? "승리했습니다!" : winner.name + " 승리. 패배했습니다.";
-		JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
 		itemPhase = false;
 		rollButton.setEnabled(false);
 		setMyItemButtonsEnabled(false);
+
+		String resultPageClassName = winner == me ? "smarthome.승리엔딩" : "smarthome.패배엔딩";
+		if (!openEndingPage(resultPageClassName, me.name)) {
+			String title = winner == me ? "위너 페이지" : "루저 페이지";
+			String message = winner == me ? "승리했습니다!" : winner.name + " 승리. 패배했습니다.";
+			JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+
+		dispose();
+	}
+
+	private boolean openEndingPage(String className, String animalName) {
+		try {
+			Class<?> pageClass = Class.forName(className);
+			Object page = pageClass.getDeclaredConstructor(String.class).newInstance(animalName);
+			if (page instanceof JFrame) {
+				((JFrame) page).setVisible(true);
+				return true;
+			}
+		} catch (Exception exception) {
+			return false;
+		}
+		return false;
 	}
 
 	private JPanel createSimplePlayerPanel(String title, Player player) {
@@ -558,6 +581,23 @@ public class Main extends JFrame {
 		Image image = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
 		label.setText("");
 		label.setIcon(new ImageIcon(image));
+	}
+
+	private Player createPlayer(Object selectedPlayer) {
+		if (selectedPlayer instanceof Player) {
+			return (Player) selectedPlayer;
+		}
+
+		String animalName = selectedPlayer == null ? "플레이어" : selectedPlayer.getClass().getSimpleName();
+		return new Player(animalName, getAnimalImagePath(animalName));
+	}
+
+	private String getAnimalImagePath(String animalName) {
+		if ("코끼리".equals(animalName) || "원숭이".equals(animalName) || "타조".equals(animalName)
+				|| "기린".equals(animalName) || "알파카".equals(animalName)) {
+			return "src/채연/" + animalName + ".jpg";
+		}
+		return null;
 	}
 
 	private static List<Player> createSamplePlayers() {

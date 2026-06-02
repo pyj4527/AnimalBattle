@@ -31,6 +31,10 @@ public class 패배엔딩 extends JFrame {
 	}
 
 	public 패배엔딩() {
+		this("코끼리");
+	}
+
+	public 패배엔딩(String animalName) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 
@@ -40,7 +44,7 @@ public class 패배엔딩 extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		ImageIcon icon = new ImageIcon(패배엔딩.class.getResource("/smarthome/image/패배엔딩1.png"));
+		ImageIcon icon = new ImageIcon("src/채연/패배엔딩1.png");
 		Image img = icon.getImage();
 		Image resizedImg = img.getScaledInstance(600, 420, Image.SCALE_SMOOTH);
 		
@@ -59,5 +63,22 @@ public class 패배엔딩 extends JFrame {
 
 		pack();
 		setLocationRelativeTo(null);
+
+		setLoseAnimalImage(animalName);
+	}
+
+	private void setLoseAnimalImage(String animalName) {
+		JLabel 동물패배사진 = (JLabel) contentPane.getComponent(0);
+		if ("코끼리".equals(animalName)) {
+			동물패배사진.setIcon(new ImageIcon("src/채연/코끼리.jpg"));
+		} else if ("원숭이".equals(animalName)) {
+			동물패배사진.setIcon(new ImageIcon("src/채연/원숭이.jpg"));
+		} else if ("타조".equals(animalName)) {
+			동물패배사진.setIcon(new ImageIcon("src/채연/타조.jpg"));
+		} else if ("기린".equals(animalName)) {
+			동물패배사진.setIcon(new ImageIcon("src/채연/기린.jpg"));
+		} else if ("알파카".equals(animalName)) {
+			동물패배사진.setIcon(new ImageIcon("src/채연/알파카.jpg"));
+		}
 	}
 }

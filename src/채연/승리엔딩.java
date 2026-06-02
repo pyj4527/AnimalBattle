@@ -2,8 +2,6 @@ package smarthome;
 
 import java.awt.Image;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -19,12 +17,10 @@ public class 승리엔딩 extends JFrame {
 	private JPanel contentPane;
 
 	public 승리엔딩() {
-		this(createPreviewAnimals());
+		this("코끼리");
 	}
 
-	public 승리엔딩(List<Animal> animals) {
-		Animal player = animals.get(0);
-
+	public 승리엔딩(String animalName) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 
@@ -36,7 +32,7 @@ public class 승리엔딩 extends JFrame {
 
 		JLabel 배경 = new JLabel();
 
-		ImageIcon icon = new ImageIcon(승리엔딩.class.getResource("/smarthome/image/승리엔딩1.png"));
+		ImageIcon icon = new ImageIcon("src/채연/승리엔딩1.png");
 		Image img = icon.getImage();
 		Image changeImg = img.getScaledInstance(600, 420, Image.SCALE_SMOOTH);
 
@@ -61,22 +57,21 @@ public class 승리엔딩 extends JFrame {
 			dispose();
 		});
 
-		if (player instanceof 코끼리) {
-			동물승리사진.setIcon(new ImageIcon(승리엔딩.class.getResource("/smarthome/image/코끼리세레머니.jpg")));
-		} else if (player instanceof 원숭이) {
-			동물승리사진.setIcon(new ImageIcon(승리엔딩.class.getResource("/smarthome/image/원숭이세레머니.jpg")));
-		} else if (player instanceof 타조) {
-			동물승리사진.setIcon(new ImageIcon(승리엔딩.class.getResource("/smarthome/image/타조세레머니.jpg")));
-		} else if (player instanceof 기린) {
-			동물승리사진.setIcon(new ImageIcon(승리엔딩.class.getResource("/smarthome/image/기린세레머니.jpg")));
-		} else if (player instanceof 알파카) {
-			동물승리사진.setIcon(new ImageIcon(승리엔딩.class.getResource("/smarthome/image/알파카세레머니.jpg")));
-		}
+		setWinAnimalImage(animalName);
 	}
 
-	private static List<Animal> createPreviewAnimals() {
-		List<Animal> animals = new ArrayList<Animal>();
-		animals.add(new 코끼리());
-		return animals;
+	private void setWinAnimalImage(String animalName) {
+		JLabel 동물승리사진 = (JLabel) contentPane.getComponent(0);
+		if ("코끼리".equals(animalName)) {
+			동물승리사진.setIcon(new ImageIcon("src/채연/코끼리세레머니.jpg"));
+		} else if ("원숭이".equals(animalName)) {
+			동물승리사진.setIcon(new ImageIcon("src/채연/원숭이세레머니.jpg"));
+		} else if ("타조".equals(animalName)) {
+			동물승리사진.setIcon(new ImageIcon("src/채연/타조세레머니.jpg"));
+		} else if ("기린".equals(animalName)) {
+			동물승리사진.setIcon(new ImageIcon("src/채연/기린세레머니.jpg"));
+		} else if ("알파카".equals(animalName)) {
+			동물승리사진.setIcon(new ImageIcon("src/채연/알파카세레머니.jpg"));
+		}
 	}
 }
