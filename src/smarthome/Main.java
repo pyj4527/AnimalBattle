@@ -34,7 +34,7 @@ public class Main extends JFrame {
 	private static final int ITEM_DISTANCE = 2;
 	private static final int DICE_MIN = 1;
 	private static final int DICE_MAX = 6;
-	private static final int RIVAL_COUNT = 5;
+	private static final int RIVAL_COUNT = 4;
 
 	private final JPanel contentPane;
 	private final Random random = new Random();
