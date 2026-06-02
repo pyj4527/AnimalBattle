@@ -1,7 +1,9 @@
 package animal;
 
 public abstract class Animal implements Attackable, Boostable {
-	public static final int FINISH_DISTANCE = 30;
+	public static final int GOAL_DISTANCE = 30;
+	public static final int ITEM_DISTANCE = 2;
+	public static final int FINISH_DISTANCE = GOAL_DISTANCE;
 
 	private String name;
 	private int distance;
@@ -34,8 +36,8 @@ public abstract class Animal implements Attackable, Boostable {
 	public void setDistance(int distance) {
 		if (distance < 0) {
 			this.distance = 0;
-		} else if (distance > FINISH_DISTANCE) {
-			this.distance = FINISH_DISTANCE;
+		} else if (distance > GOAL_DISTANCE) {
+			this.distance = GOAL_DISTANCE;
 		} else {
 			this.distance = distance;
 		}
@@ -46,11 +48,11 @@ public abstract class Animal implements Attackable, Boostable {
 	}
 
 	public int getBoosterSpeed() {
-		return 2;
+		return ITEM_DISTANCE;
 	}
 
 	public int getAttackPower() {
-		return 2;
+		return ITEM_DISTANCE;
 	}
 
 	public String getAttackName() {
