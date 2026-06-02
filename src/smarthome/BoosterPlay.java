@@ -14,9 +14,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
@@ -28,15 +28,12 @@ public class BoosterPlay extends JFrame {
 	private JPanel contentPane;
 	private JFrame mainFrame;
 
-	private JLabel beforeImageLabel;
-	private JLabel afterImageLabel;
-	private JLabel boosterNameLabel;
-	private JLabel beforeNameLabel;
-	private JLabel afterNameLabel;
-	private JProgressBar beforeProgressBar;
-	private JProgressBar afterProgressBar;
+	private JLabel animalImageLabel;
+	private JLabel animalNameLabel;
+	private JLabel distanceLabel;
+	private JProgressBar distanceProgressBar;
 	private JTextArea logTextArea;
-	private JButton arrowButton;
+	private JButton boosterButton;
 	private JButton closeButton;
 
 	private String animalName;
@@ -50,7 +47,7 @@ public class BoosterPlay extends JFrame {
 			public void run() {
 				try {
 					BoosterPlay frame = new BoosterPlay();
-					frame.showBooster("코끼리", 4, 6);
+					frame.showBooster("타조", 5, 7);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -80,110 +77,80 @@ public class BoosterPlay extends JFrame {
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
 
-		JLabel beforeTitleLabel = new JLabel("부스터 사용 전");
-		beforeTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		beforeTitleLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 22));
-		beforeTitleLabel.setBorder(new LineBorder(Color.BLACK, 2));
-		beforeTitleLabel.setBounds(65, 55, 260, 34);
-		contentPane.add(beforeTitleLabel);
+		JLabel titleLabel = new JLabel("부스터 사용");
+		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		titleLabel.setForeground(Color.BLACK);
+		titleLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 34));
+		titleLabel.setBounds(0, 38, 984, 48);
+		contentPane.add(titleLabel);
 
-		JLabel afterTitleLabel = new JLabel("부스터 사용 후");
-		afterTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		afterTitleLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 22));
-		afterTitleLabel.setBorder(new LineBorder(Color.BLACK, 2));
-		afterTitleLabel.setBounds(620, 55, 270, 34);
-		contentPane.add(afterTitleLabel);
+		JLabel guideLabel = new JLabel("에너지를 모아 앞으로 2칸 이동합니다");
+		guideLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		guideLabel.setForeground(new Color(45, 45, 45));
+		guideLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 17));
+		guideLabel.setBounds(0, 90, 984, 28);
+		contentPane.add(guideLabel);
 
-		beforeImageLabel = new JLabel("부스터 전 이미지");
-		beforeImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		beforeImageLabel.setFont(new Font("Malgun Gothic", Font.PLAIN, 20));
-		beforeImageLabel.setBorder(new LineBorder(Color.BLACK, 2));
-		beforeImageLabel.setBounds(60, 110, 275, 270);
-		contentPane.add(beforeImageLabel);
+		animalImageLabel = new JLabel("동물 이미지");
+		animalImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		animalImageLabel.setFont(new Font("Malgun Gothic", Font.PLAIN, 20));
+		animalImageLabel.setOpaque(true);
+		animalImageLabel.setBackground(Color.WHITE);
+		animalImageLabel.setBorder(new LineBorder(Color.BLACK, 2));
+		animalImageLabel.setBounds(365, 132, 255, 255);
+		contentPane.add(animalImageLabel);
 
-		afterImageLabel = new JLabel("부스터 후 이미지");
-		afterImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		afterImageLabel.setFont(new Font("Malgun Gothic", Font.PLAIN, 20));
-		afterImageLabel.setBorder(new LineBorder(Color.BLACK, 2));
-		afterImageLabel.setBounds(620, 110, 275, 270);
-		contentPane.add(afterImageLabel);
+		animalNameLabel = new JLabel("타조");
+		animalNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		animalNameLabel.setForeground(Color.BLACK);
+		animalNameLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 24));
+		animalNameLabel.setBounds(392, 400, 200, 34);
+		contentPane.add(animalNameLabel);
 
-		boosterNameLabel = new JLabel("부스터");
-		boosterNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		boosterNameLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 24));
-		boosterNameLabel.setBounds(395, 200, 180, 65);
-		contentPane.add(boosterNameLabel);
+		distanceLabel = new JLabel("거리 5 / 30 -> 7 / 30");
+		distanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		distanceLabel.setForeground(Color.BLACK);
+		distanceLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 18));
+		distanceLabel.setBounds(312, 442, 360, 28);
+		contentPane.add(distanceLabel);
 
-		arrowButton = new JButton("▶");
-		arrowButton.setHorizontalAlignment(SwingConstants.CENTER);
-		arrowButton.setVerticalAlignment(SwingConstants.CENTER);
-		arrowButton.setFont(new Font("Malgun Gothic", Font.BOLD, 68));
-		arrowButton.setBorderPainted(false);
-		arrowButton.setContentAreaFilled(false);
-		arrowButton.setFocusPainted(false);
-		arrowButton.setOpaque(false);
-		arrowButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-		arrowButton.setBounds(408, 193, 140, 105);
-		contentPane.add(arrowButton);
+		distanceProgressBar = new JProgressBar(0, MAX_DISTANCE);
+		distanceProgressBar.setStringPainted(true);
+		distanceProgressBar.setForeground(new Color(0, 220, 255));
+		distanceProgressBar.setBackground(new Color(235, 235, 235));
+		distanceProgressBar.setFont(new Font("Malgun Gothic", Font.BOLD, 14));
+		distanceProgressBar.setBounds(242, 478, 500, 28);
+		contentPane.add(distanceProgressBar);
 
-		arrowButton.addActionListener(new ActionListener() {
+		boosterButton = new JButton("BOOST");
+		boosterButton.setFont(new Font("Malgun Gothic", Font.BOLD, 20));
+		boosterButton.setForeground(Color.WHITE);
+		boosterButton.setBackground(new Color(0, 135, 255));
+		boosterButton.setFocusPainted(false);
+		boosterButton.setBounds(362, 590, 220, 44);
+		contentPane.add(boosterButton);
+
+		boosterButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				playBooster();
 			}
 		});
-
-		beforeNameLabel = new JLabel("코끼리");
-		beforeNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		beforeNameLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 16));
-		beforeNameLabel.setBorder(new LineBorder(Color.BLACK, 2));
-		beforeNameLabel.setBounds(145, 392, 95, 28);
-		contentPane.add(beforeNameLabel);
-
-		afterNameLabel = new JLabel("코끼리");
-		afterNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		afterNameLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 16));
-		afterNameLabel.setBorder(new LineBorder(Color.BLACK, 2));
-		afterNameLabel.setBounds(710, 392, 95, 28);
-		contentPane.add(afterNameLabel);
-
-		JLabel beforeDistanceTextLabel = new JLabel("거리");
-		beforeDistanceTextLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 17));
-		beforeDistanceTextLabel.setBounds(70, 428, 44, 26);
-		contentPane.add(beforeDistanceTextLabel);
-
-		JLabel afterDistanceTextLabel = new JLabel("거리");
-		afterDistanceTextLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 17));
-		afterDistanceTextLabel.setBounds(630, 428, 44, 26);
-		contentPane.add(afterDistanceTextLabel);
-
-		beforeProgressBar = new JProgressBar(0, MAX_DISTANCE);
-		beforeProgressBar.setStringPainted(true);
-		beforeProgressBar.setBounds(115, 430, 200, 22);
-		contentPane.add(beforeProgressBar);
-
-		afterProgressBar = new JProgressBar(0, MAX_DISTANCE);
-		afterProgressBar.setStringPainted(true);
-		afterProgressBar.setBounds(675, 430, 200, 22);
-		contentPane.add(afterProgressBar);
-
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(35, 485, 905, 100);
-		scrollPane.setBorder(new LineBorder(Color.BLACK, 2));
-		contentPane.add(scrollPane);
 
 		logTextArea = new JTextArea();
 		logTextArea.setEditable(false);
 		logTextArea.setBackground(Color.WHITE);
 		logTextArea.setForeground(Color.BLACK);
 		logTextArea.setCaretColor(Color.BLACK);
-		logTextArea.setFont(new Font("Malgun Gothic", Font.PLAIN, 16));
+		logTextArea.setFont(new Font("Malgun Gothic", Font.PLAIN, 13));
 		logTextArea.setLineWrap(true);
 		logTextArea.setWrapStyleWord(true);
-		scrollPane.setViewportView(logTextArea);
+		logTextArea.setBorder(new LineBorder(Color.BLACK, 1));
+		logTextArea.setBounds(232, 520, 520, 58);
+		contentPane.add(logTextArea);
 
 		closeButton = new JButton("close");
 		closeButton.setFont(new Font("Malgun Gothic", Font.BOLD, 14));
-		closeButton.setBounds(835, 600, 105, 30);
+		closeButton.setBounds(795, 590, 105, 34);
 		contentPane.add(closeButton);
 
 		closeButton.addActionListener(new ActionListener() {
@@ -198,25 +165,19 @@ public class BoosterPlay extends JFrame {
 
 	public void showBooster(String animalName, int beforeDistance, int afterDistance) {
 		this.animalName = animalName;
-		this.beforeDistance = beforeDistance;
-		this.afterDistance = afterDistance;
+		this.beforeDistance = normalizeDistance(beforeDistance);
+		this.afterDistance = normalizeDistance(afterDistance);
 		boosterFinished = false;
 
-		int beforeValue = normalizeDistance(beforeDistance);
 		setTitle("부스터 장면 - " + animalName);
-		beforeNameLabel.setText(animalName);
-		afterNameLabel.setText(animalName);
-		boosterNameLabel.setText("부스터");
-		setImage(beforeImageLabel, getAnimalImagePath(animalName), animalName);
-		setImage(afterImageLabel, getAnimalImagePath(animalName), animalName);
-		beforeProgressBar.setValue(beforeValue);
-		afterProgressBar.setValue(beforeValue);
-		beforeProgressBar.setString(beforeValue + " / " + MAX_DISTANCE);
-		afterProgressBar.setString(beforeValue + " / " + MAX_DISTANCE);
-		arrowButton.setEnabled(true);
+		animalNameLabel.setText(animalName);
+		setImage(animalImageLabel, getAnimalImagePath(animalName), animalName);
+		distanceProgressBar.setValue(this.beforeDistance);
+		updateDistanceText(this.beforeDistance);
+		boosterButton.setEnabled(true);
 		clearConsole();
-		appendConsoleMessage(animalName + "이(가) 부스터를 사용하려고 합니다.");
-		appendConsoleMessage("가운데 화살표 버튼을 누르면 앞으로 2칸 이동합니다.");
+		appendConsoleMessage(animalName + "이(가) 부스터를 준비합니다.");
+		appendConsoleMessage("BOOST 버튼을 누르면 거리 게이지가 올라갑니다.");
 	}
 
 	public void setBoosterAction(Runnable boosterAction) {
@@ -228,16 +189,35 @@ public class BoosterPlay extends JFrame {
 			return;
 		}
 
-		int afterValue = normalizeDistance(afterDistance);
-		afterProgressBar.setValue(afterValue);
-		afterProgressBar.setString(afterValue + " / " + MAX_DISTANCE);
-		appendConsoleMessage("부스터를 사용했습니다.");
-		appendConsoleMessage(animalName + " 부스터 : 거리 " + beforeDistance + " -> " + afterDistance);
-		if (boosterAction != null) {
-			boosterAction.run();
-		}
-		boosterFinished = true;
-		arrowButton.setEnabled(false);
+		boosterButton.setEnabled(false);
+		appendConsoleMessage("부스터 발동!");
+
+		Timer timer = new Timer(80, null);
+		timer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int currentValue = distanceProgressBar.getValue();
+				if (currentValue < afterDistance) {
+					int nextValue = Math.min(afterDistance, currentValue + 1);
+					distanceProgressBar.setValue(nextValue);
+					updateDistanceText(nextValue);
+					return;
+				}
+
+				timer.stop();
+				appendConsoleMessage(animalName + " 부스터 : 거리 " + beforeDistance + " -> " + afterDistance);
+				if (boosterAction != null) {
+					boosterAction.run();
+				}
+				boosterFinished = true;
+			}
+		});
+		timer.start();
+	}
+
+	private void updateDistanceText(int currentDistance) {
+		distanceLabel.setText("거리 " + beforeDistance + " / " + MAX_DISTANCE
+				+ " -> " + afterDistance + " / " + MAX_DISTANCE);
+		distanceProgressBar.setString(currentDistance + " / " + MAX_DISTANCE);
 	}
 
 	private void setImage(JLabel label, String imagePath, String fallbackText) {
