@@ -4,8 +4,16 @@ import java.awt.Image;
 import java.awt.EventQueue;
 import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+
+import animal.기린;
+import animal.알파카;
+import animal.원숭이;
+import animal.코끼리;
+import animal.타조;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -68,29 +76,39 @@ public class start extends JFrame {
         알파카선택.setBounds(485, 301, 94, 40);
         contentPane.add(알파카선택);
 
-        코끼리선택.addActionListener(e -> {
-            new Main(createPlayers("코끼리", "원숭이", "타조", "기린", "알파카")).setVisible(true);
-            dispose();
+        코끼리선택.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new Main(createPlayers("코끼리", "원숭이", "타조", "기린", "알파카")).setVisible(true);
+                dispose();
+            }
         });
 
-        원숭이선택.addActionListener(e -> {
-            new Main(createPlayers("원숭이", "코끼리", "타조", "기린", "알파카")).setVisible(true);
-            dispose();
+        원숭이선택.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new Main(createPlayers("원숭이", "코끼리", "타조", "기린", "알파카")).setVisible(true);
+                dispose();
+            }
         });
 
-        타조선택.addActionListener(e -> {
-            new Main(createPlayers("타조", "코끼리", "원숭이", "기린", "알파카")).setVisible(true);
-            dispose();
+        타조선택.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new Main(createPlayers("타조", "코끼리", "원숭이", "기린", "알파카")).setVisible(true);
+                dispose();
+            }
         });
 
-        기린선택.addActionListener(e -> {
-            new Main(createPlayers("기린", "코끼리", "원숭이", "타조", "알파카")).setVisible(true);
-            dispose();
+        기린선택.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new Main(createPlayers("기린", "코끼리", "원숭이", "타조", "알파카")).setVisible(true);
+                dispose();
+            }
         });
 
-        알파카선택.addActionListener(e -> {
-            new Main(createPlayers("알파카", "코끼리", "원숭이", "타조", "기린")).setVisible(true);
-            dispose();
+        알파카선택.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new Main(createPlayers("알파카", "코끼리", "원숭이", "타조", "기린")).setVisible(true);
+                dispose();
+            }
         });
 
         ImageIcon icon = new ImageIcon("src/채연/동물레이스.png");
@@ -105,17 +123,32 @@ public class start extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    private List<Main.Player> createPlayers(String first, String second, String third, String fourth, String fifth) {
-        List<Main.Player> players = new ArrayList<>();
-        players.add(createPlayer(first));
-        players.add(createPlayer(second));
-        players.add(createPlayer(third));
-        players.add(createPlayer(fourth));
-        players.add(createPlayer(fifth));
+    private List<Object> createPlayers(String first, String second, String third, String fourth, String fifth) {
+        List<Object> players = new ArrayList<>();
+        players.add(createAnimal(first));
+        players.add(createAnimal(second));
+        players.add(createAnimal(third));
+        players.add(createAnimal(fourth));
+        players.add(createAnimal(fifth));
         return players;
     }
 
-    private Main.Player createPlayer(String animalName) {
-        return new Main.Player(animalName, "src/채연/" + animalName + ".jpg");
+    private Object createAnimal(String animalName) {
+        if ("코끼리".equals(animalName)) {
+            return new 코끼리();
+        }
+        if ("원숭이".equals(animalName)) {
+            return new 원숭이();
+        }
+        if ("타조".equals(animalName)) {
+            return new 타조();
+        }
+        if ("기린".equals(animalName)) {
+            return new 기린();
+        }
+        if ("알파카".equals(animalName)) {
+            return new 알파카();
+        }
+        return animalName;
     }
 }

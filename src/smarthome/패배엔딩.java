@@ -3,6 +3,8 @@ package smarthome;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -48,7 +50,7 @@ public class 패배엔딩 extends JFrame {
 		Image img = icon.getImage();
 		Image resizedImg = img.getScaledInstance(600, 420, Image.SCALE_SMOOTH);
 		
-		JLabel 동물패배사진 = new JLabel("New label");
+		JLabel 동물패배사진 = new JLabel("");
 		동물패배사진.setBounds(213, 160, 168, 168);
 		contentPane.add(동물패배사진);
 		
@@ -64,9 +66,11 @@ public class 패배엔딩 extends JFrame {
 		pack();
 		setLocationRelativeTo(null);
 
-		메인메뉴.addActionListener(e -> {
-			new start().setVisible(true);
-			dispose();
+		메인메뉴.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new start().setVisible(true);
+				dispose();
+			}
 		});
 
 		setLoseAnimalImage(animalName);

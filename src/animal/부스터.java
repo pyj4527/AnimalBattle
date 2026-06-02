@@ -1,5 +1,5 @@
 package animal;
 
-public interface Boostable {
+public interface 부스터 {
 	void booster();
 }

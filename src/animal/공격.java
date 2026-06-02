@@ -1,5 +1,5 @@
 package animal;
 
-public interface Attackable {
+public interface 공격 {
 	void attack(Animal target);
 }

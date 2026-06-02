@@ -1,6 +1,6 @@
 package animal;
 
-public abstract class Animal implements Attackable, Boostable {
+public abstract class Animal {
 	public static final int GOAL_DISTANCE = 30;
 	public static final int ITEM_DISTANCE = 2;
 	public static final int FINISH_DISTANCE = GOAL_DISTANCE;

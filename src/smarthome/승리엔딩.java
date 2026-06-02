@@ -1,7 +1,10 @@
 package smarthome;
 
 import java.awt.Image;
+import java.awt.EventQueue;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -15,6 +18,19 @@ public class 승리엔딩 extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					승리엔딩 frame = new 승리엔딩();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
 	public 승리엔딩() {
 		this("코끼리");
@@ -52,9 +68,11 @@ public class 승리엔딩 extends JFrame {
 		pack();
 		setLocationRelativeTo(null);
 
-		메인메뉴.addActionListener(e -> {
-			new start().setVisible(true);
-			dispose();
+		메인메뉴.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new start().setVisible(true);
+				dispose();
+			}
 		});
 
 		setWinAnimalImage(animalName);
