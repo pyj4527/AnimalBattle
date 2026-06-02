@@ -1,4 +1,4 @@
-package 혜주;
+package smarthome;
 
 import java.awt.Color;
 import java.awt.EventQueue;

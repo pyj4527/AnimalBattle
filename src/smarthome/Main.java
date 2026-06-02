@@ -1,4 +1,4 @@
-package 여진;
+package smarthome;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -398,7 +398,7 @@ public class Main extends JFrame {
 	private void attack(Player attacker, Player target) {
 		target.distance = Math.max(0, target.distance - ITEM_DISTANCE);
 		target.displayDistance = target.distance;
-		if (!openFrameIfAvailable("혜주.Play")) {
+		if (!openFrameIfAvailable("smarthome.Play")) {
 			openAttackPage(attacker, target);
 		}
 		refreshScreen();
@@ -512,7 +512,7 @@ public class Main extends JFrame {
 		dispose();
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				if (!openFrameIfAvailable("채연.Start_End_page")) {
+				if (!openFrameIfAvailable("smarthome.start")) {
 					new Main(createSamplePlayers()).setVisible(true);
 				}
 			}
