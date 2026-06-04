@@ -224,8 +224,11 @@ public class Play extends JFrame {
 	}
 
 	private String findImagePath(String type, String fileName) {
-		// TODO: 공격/피격 사진 경로를 여기에 넣으세요.
-		return "";
+		File projectRootPath = new File(new File(new File(new File("src", "혜주"), "images"), type), fileName);
+		if (projectRootPath.exists()) {
+			return projectRootPath.getPath();
+		}
+		return new File(new File(new File("혜주", "images"), type), fileName).getPath();
 	}
 
 	private void clearConsole() {

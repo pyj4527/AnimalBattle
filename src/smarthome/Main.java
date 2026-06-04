@@ -525,8 +525,15 @@ public class Main extends JFrame {
 	}
 
 	private static String findAssetPath(String fileName) {
-		// TODO: 메인 화면 배경 사진 경로를 여기에 넣으세요.
-		return "";
+		return findImagePath("채연", fileName);
+	}
+
+	private static String findImagePath(String folderName, String fileName) {
+		File projectRootPath = new File(new File("src", folderName), fileName);
+		if (projectRootPath.exists()) {
+			return projectRootPath.getPath();
+		}
+		return new File(new File(folderName), fileName).getPath();
 	}
 
 	private static class BackgroundPanel extends JPanel {

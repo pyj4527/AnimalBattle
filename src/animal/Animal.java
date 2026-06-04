@@ -109,7 +109,14 @@ public abstract class Animal {
 	}
 
 	public static String findAnimalImagePath(String animalName) {
-		// TODO: 동물 사진 경로를 여기에 넣으세요. 예: "src/채연/코끼리.jpg"
-		return "";
+		return findImagePath("채연", animalName + ".jpg");
+	}
+
+	private static String findImagePath(String folderName, String fileName) {
+		File projectRootPath = new File(new File("src", folderName), fileName);
+		if (projectRootPath.exists()) {
+			return projectRootPath.getPath();
+		}
+		return new File(new File(folderName), fileName).getPath();
 	}
 }
