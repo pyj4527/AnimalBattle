@@ -1,32 +1,68 @@
 package animal;
 
+import java.io.File;
+
 public abstract class Animal {
 	public static final int GOAL_DISTANCE = 30;
 	public static final int ITEM_DISTANCE = 2;
 	public static final int FINISH_DISTANCE = GOAL_DISTANCE;
 
-	private String name;
+	private final String name;
+	private final String imagePath;
 	private int distance;
+	private int displayDistance;
+	private int distanceAfterDice;
 
-	public Animal(String name, int distance) {
-		this.name = name;
-		setDistance(distance);
+	public Animal(String name) {
+		this(name, findAnimalImagePath(name));
 	}
 
-	public void moveBy(int value) {
+	public Animal(String name, String imagePath) {
+		this.name = name;
+		this.imagePath = imagePath;
+		reset();
+	}
+
+	public void move(int value) {
 		setDistance(distance + value);
 	}
 
+	public void moveBy(int value) {
+		move(value);
+	}
+
 	public void damaged(int damage) {
-		setDistance(distance - damage);
+		move(-damage);
 	}
 
 	public void reset() {
-		setDistance(0);
+		distance = 0;
+		displayDistance = 0;
+		distanceAfterDice = 0;
+	}
+
+	public void markDistanceAfterDice() {
+		distanceAfterDice = distance;
+	}
+
+	public boolean increaseDisplayDistance() {
+		if (displayDistance >= distance) {
+			return false;
+		}
+		displayDistance++;
+		return true;
+	}
+
+	public void syncDisplayDistance() {
+		displayDistance = distance;
 	}
 
 	public String getName() {
 		return name;
+	}
+
+	public String getImagePath() {
+		return imagePath;
 	}
 
 	public int getDistance() {
@@ -34,13 +70,18 @@ public abstract class Animal {
 	}
 
 	public void setDistance(int distance) {
-		if (distance < 0) {
-			this.distance = 0;
-		} else if (distance > GOAL_DISTANCE) {
-			this.distance = GOAL_DISTANCE;
-		} else {
-			this.distance = distance;
+		this.distance = limitDistance(distance);
+		if (displayDistance > this.distance) {
+			displayDistance = this.distance;
 		}
+	}
+
+	public int getDisplayDistance() {
+		return displayDistance;
+	}
+
+	public int getDistanceAfterDice() {
+		return distanceAfterDice;
 	}
 
 	public int getSpeedRank() {
@@ -56,6 +97,19 @@ public abstract class Animal {
 	}
 
 	public String getAttackName() {
+		return "공격";
+	}
+
+	public String toString() {
+		return name;
+	}
+
+	private int limitDistance(int value) {
+		return Math.max(0, Math.min(GOAL_DISTANCE, value));
+	}
+
+	public static String findAnimalImagePath(String animalName) {
+		// TODO: 동물 사진 경로를 여기에 넣으세요. 예: "src/채연/코끼리.jpg"
 		return "";
 	}
 }

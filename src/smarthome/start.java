@@ -1,154 +1,122 @@
 package smarthome;
 
-import java.awt.Image;
-import java.awt.EventQueue;
-import java.awt.Dimension;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.io.File;
 import java.util.List;
 
-import animal.기린;
-import animal.알파카;
-import animal.원숭이;
-import animal.코끼리;
-import animal.타조;
-
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+import animal.Animal;
+import animal.GameManager;
 
 public class start extends JFrame {
+	private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
-    private final JLabel lblNewLabel = new JLabel("New label");
+	public static void main(String[] args) {
+		new start().setVisible(true);
+	}
 
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    start frame = new start();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+	public start() {
+		setTitle("플레이어 선택");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
 
-    public start() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);
+		JPanel contentPane = new BackgroundPanel(findAssetPath("동물레이스.png"));
+		contentPane.setBorder(new EmptyBorder(18, 18, 18, 18));
+		contentPane.setLayout(null);
+		contentPane.setPreferredSize(new Dimension(760, 460));
+		setContentPane(contentPane);
 
-        contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-        contentPane.setLayout(null);
-        contentPane.setPreferredSize(new Dimension(600, 420));
-        setContentPane(contentPane);
+		JLabel titleLabel = new JLabel("플레이어 선택", SwingConstants.CENTER);
+		titleLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 28));
+		titleLabel.setBounds(18, 18, 724, 42);
+		contentPane.add(titleLabel);
 
-        JButton 타조선택 = new JButton("선택하기");
-        타조선택.setBackground(Color.ORANGE);
-        타조선택.setBounds(253, 301, 94, 40);
-        contentPane.add(타조선택);
+		JPanel animalPanel = new JPanel(new GridLayout(1, 5, 12, 0));
+		animalPanel.setOpaque(false);
+		animalPanel.setBounds(18, 82, 724, 330);
+		contentPane.add(animalPanel);
 
-        JButton 코끼리선택 = new JButton("선택하기");
-        코끼리선택.setBackground(Color.BLUE);
-        코끼리선택.setBounds(22, 301, 94, 40);
-        contentPane.add(코끼리선택);
+		for (Animal animal : GameManager.createDefaultAnimals()) {
+			animalPanel.add(createAnimalChoicePanel(animal));
+		}
 
-        JButton 원숭이선택 = new JButton("선택하기");
-        원숭이선택.setBackground(Color.GREEN);
-        원숭이선택.setBounds(138, 301, 94, 40);
-        contentPane.add(원숭이선택);
+		pack();
+		setLocationRelativeTo(null);
+	}
 
-        JButton 기린선택 = new JButton("선택하기");
-        기린선택.setBackground(new Color(128, 0, 128));
-        기린선택.setBounds(370, 301, 94, 40);
-        contentPane.add(기린선택);
+	private JPanel createAnimalChoicePanel(Animal animal) {
+		JPanel panel = new JPanel();
+		panel.setLayout(null);
+		panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
-        JButton 알파카선택 = new JButton("선택하기");
-        알파카선택.setBackground(Color.PINK);
-        알파카선택.setBounds(485, 301, 94, 40);
-        contentPane.add(알파카선택);
+		JLabel imageLabel = new JLabel();
+		imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		imageLabel.setBounds(10, 16, 118, 180);
+		setAnimalImage(imageLabel, animal, 118, 180);
+		panel.add(imageLabel);
 
-        코끼리선택.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new Main(createPlayers("코끼리", "원숭이", "타조", "기린", "알파카")).setVisible(true);
-                dispose();
-            }
-        });
+		JLabel nameLabel = new JLabel(animal.getName(), SwingConstants.CENTER);
+		nameLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 18));
+		nameLabel.setBounds(10, 207, 118, 28);
+		panel.add(nameLabel);
 
-        원숭이선택.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new Main(createPlayers("원숭이", "코끼리", "타조", "기린", "알파카")).setVisible(true);
-                dispose();
-            }
-        });
+		JButton selectButton = new JButton("선택하기");
+		selectButton.setBackground(Color.ORANGE);
+		selectButton.setBounds(17, 260, 104, 40);
+		selectButton.addActionListener(e -> openGame(animal.getName()));
+		panel.add(selectButton);
 
-        타조선택.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new Main(createPlayers("타조", "코끼리", "원숭이", "기린", "알파카")).setVisible(true);
-                dispose();
-            }
-        });
+		return panel;
+	}
 
-        기린선택.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new Main(createPlayers("기린", "코끼리", "원숭이", "타조", "알파카")).setVisible(true);
-                dispose();
-            }
-        });
+	private void openGame(String selectedAnimalName) {
+		List<Animal> animals = GameManager.createAnimalsWithSelectedFirst(selectedAnimalName);
+		new Main(animals).setVisible(true);
+		dispose();
+	}
 
-        알파카선택.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new Main(createPlayers("알파카", "코끼리", "원숭이", "타조", "기린")).setVisible(true);
-                dispose();
-            }
-        });
+	private void setAnimalImage(JLabel label, Animal animal, int width, int height) {
+		ImageIcon icon = new ImageIcon(animal.getImagePath());
+		if (icon.getIconWidth() <= 0) {
+			label.setText(animal.getName());
+			return;
+		}
+		Image image = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+		label.setIcon(new ImageIcon(image));
+	}
 
-        ImageIcon icon = new ImageIcon("src/채연/동물레이스.png");
-        Image img = icon.getImage();
-        Image changeImg = img.getScaledInstance(600, 420, Image.SCALE_SMOOTH);
+	private static String findAssetPath(String fileName) {
+		// TODO: 시작 화면 배경 사진 경로를 여기에 넣으세요.
+		return "";
+	}
 
-        lblNewLabel.setIcon(new ImageIcon(changeImg));
-        lblNewLabel.setBounds(0, -10, 600, 420);
-        contentPane.add(lblNewLabel);
+	private static class BackgroundPanel extends JPanel {
+		private static final long serialVersionUID = 1L;
+		private final Image backgroundImage;
 
-        pack();
-        setLocationRelativeTo(null);
-    }
+		private BackgroundPanel(String imagePath) {
+			backgroundImage = imagePath == null || imagePath.trim().isEmpty()
+					? null : new ImageIcon(imagePath).getImage();
+		}
 
-    private List<Object> createPlayers(String first, String second, String third, String fourth, String fifth) {
-        List<Object> players = new ArrayList<>();
-        players.add(createAnimal(first));
-        players.add(createAnimal(second));
-        players.add(createAnimal(third));
-        players.add(createAnimal(fourth));
-        players.add(createAnimal(fifth));
-        return players;
-    }
-
-    private Object createAnimal(String animalName) {
-        if ("코끼리".equals(animalName)) {
-            return new 코끼리();
-        }
-        if ("원숭이".equals(animalName)) {
-            return new 원숭이();
-        }
-        if ("타조".equals(animalName)) {
-            return new 타조();
-        }
-        if ("기린".equals(animalName)) {
-            return new 기린();
-        }
-        if ("알파카".equals(animalName)) {
-            return new 알파카();
-        }
-        return animalName;
-    }
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			if (backgroundImage != null) {
+				g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+			}
+		}
+	}
 }

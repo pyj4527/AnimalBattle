@@ -1,101 +1,101 @@
 package smarthome;
 
-import java.awt.Image;
-import java.awt.EventQueue;
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.io.File;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import java.awt.Color;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+import animal.Animal;
 
 public class 승리엔딩 extends JFrame {
-
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					승리엔딩 frame = new 승리엔딩();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	public 승리엔딩() {
 		this("코끼리");
 	}
 
 	public 승리엔딩(String animalName) {
+		setTitle("위너 페이지");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 
-		contentPane = new JPanel();
+		JPanel contentPane = new BackgroundPanel(findAssetPath("승리엔딩1.png"));
 		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		contentPane.setLayout(null);
 		contentPane.setPreferredSize(new Dimension(600, 420));
 		setContentPane(contentPane);
 
-		JLabel 배경 = new JLabel();
+		JLabel titleLabel = new JLabel("승리했습니다!", SwingConstants.CENTER);
+		titleLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 30));
+		titleLabel.setBounds(0, 28, 600, 48);
+		contentPane.add(titleLabel);
 
-		ImageIcon icon = new ImageIcon("src/채연/승리엔딩1.png");
-		Image img = icon.getImage();
-		Image changeImg = img.getScaledInstance(600, 420, Image.SCALE_SMOOTH);
+		JLabel animalImageLabel = new JLabel("", SwingConstants.CENTER);
+		animalImageLabel.setBounds(215, 110, 171, 188);
+		setEndingImage(animalImageLabel, animalName);
+		contentPane.add(animalImageLabel);
 
-		JLabel 동물승리사진 = new JLabel("");
-		동물승리사진.setBounds(215, 146, 171, 188);
-		contentPane.add(동물승리사진);
+		JLabel nameLabel = new JLabel(animalName, SwingConstants.CENTER);
+		nameLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 22));
+		nameLabel.setBounds(215, 306, 171, 32);
+		contentPane.add(nameLabel);
 
-		JButton 메인메뉴 = new JButton("메인메뉴로");
-		메인메뉴.setBackground(Color.ORANGE);
-		메인메뉴.setBounds(215, 344, 171, 51);
-		contentPane.add(메인메뉴);
-
-		배경.setIcon(new ImageIcon(changeImg));
-		배경.setBounds(0, 0, 600, 420);
-		contentPane.add(배경);
+		JButton mainMenuButton = new JButton("메인 메뉴로");
+		mainMenuButton.setBackground(Color.ORANGE);
+		mainMenuButton.setBounds(215, 350, 171, 42);
+		mainMenuButton.addActionListener(e -> {
+			new start().setVisible(true);
+			dispose();
+		});
+		contentPane.add(mainMenuButton);
 
 		pack();
 		setLocationRelativeTo(null);
-
-		메인메뉴.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new start().setVisible(true);
-				dispose();
-			}
-		});
-
-		setWinAnimalImage(animalName);
 	}
 
-	private void setWinAnimalImage(String animalName) {
-		JLabel 동물승리사진 = (JLabel) contentPane.getComponent(0);
-		if ("코끼리".equals(animalName)) {
-			setScaledImage(동물승리사진, "src/채연/코끼리세레머니.jpg");
-		} else if ("원숭이".equals(animalName)) {
-			setScaledImage(동물승리사진, "src/채연/원숭이세레머니.jpg");
-		} else if ("타조".equals(animalName)) {
-			setScaledImage(동물승리사진, "src/채연/타조세레머니.jpg");
-		} else if ("기린".equals(animalName)) {
-			setScaledImage(동물승리사진, "src/채연/기린세레머니.jpg");
-		} else if ("알파카".equals(animalName)) {
-			setScaledImage(동물승리사진, "src/채연/알파카세레머니.jpg");
+	private void setEndingImage(JLabel label, String animalName) {
+		String endingImagePath = findAssetPath(animalName + "세레머니.jpg");
+		ImageIcon icon = new ImageIcon(endingImagePath);
+		if (icon.getIconWidth() <= 0) {
+			icon = new ImageIcon(Animal.findAnimalImagePath(animalName));
 		}
+		if (icon.getIconWidth() <= 0) {
+			label.setText(animalName);
+			return;
+		}
+		Image image = icon.getImage().getScaledInstance(171, 188, Image.SCALE_SMOOTH);
+		label.setIcon(new ImageIcon(image));
 	}
 
-	private void setScaledImage(JLabel label, String imagePath) {
-		ImageIcon icon = new ImageIcon(imagePath);
-		Image image = icon.getImage().getScaledInstance(label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
-		label.setIcon(new ImageIcon(image));
+	private static String findAssetPath(String fileName) {
+		// TODO: 승리 배경/세레머니 사진 경로를 여기에 넣으세요.
+		return "";
+	}
+
+	private static class BackgroundPanel extends JPanel {
+		private static final long serialVersionUID = 1L;
+		private final Image backgroundImage;
+
+		private BackgroundPanel(String imagePath) {
+			backgroundImage = imagePath == null || imagePath.trim().isEmpty()
+					? null : new ImageIcon(imagePath).getImage();
+		}
+
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			if (backgroundImage != null) {
+				g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+			}
+		}
 	}
 }
