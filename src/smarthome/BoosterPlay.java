@@ -252,6 +252,5 @@ public class BoosterPlay extends JFrame {
 			logTextArea.append("\n");
 		}
 		logTextArea.append(message);
-		logTextArea.setCaretPosition(logTextArea.getDocument().getLength());
 	}
 }
