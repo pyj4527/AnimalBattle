@@ -4,7 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.io.File;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -12,8 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import animal.Animal;
 
 public class 패배엔딩 extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -27,7 +26,7 @@ public class 패배엔딩 extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 
-		JPanel contentPane = new BackgroundPanel(findAssetPath("패배엔딩1.png"));
+		JPanel contentPane = new BackgroundPanel("src/채연/패배엔딩1.png");
 		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		contentPane.setPreferredSize(new Dimension(600, 420));
 		contentPane.setLayout(null);
@@ -42,9 +41,11 @@ public class 패배엔딩 extends JFrame {
 		mainMenuButton.setBackground(Color.BLUE);
 		mainMenuButton.setForeground(Color.WHITE);
 		mainMenuButton.setBounds(213, 353, 168, 42);
-		mainMenuButton.addActionListener(e -> {
-			new start().setVisible(true);
-			dispose();
+		mainMenuButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new start().setVisible(true);
+				dispose();
+			}
 		});
 		contentPane.add(mainMenuButton);
 
@@ -53,25 +54,24 @@ public class 패배엔딩 extends JFrame {
 	}
 
 	private void setAnimalImage(JLabel label, String animalName) {
-		ImageIcon icon = new ImageIcon(Animal.findAnimalImagePath(animalName));
-		if (icon.getIconWidth() <= 0) {
+		ImageIcon icon = null;
+		if ("코끼리".equals(animalName)) {
+			icon = new ImageIcon("src/채연/코끼리.jpg");
+		} else if ("원숭이".equals(animalName)) {
+			icon = new ImageIcon("src/채연/원숭이.jpg");
+		} else if ("타조".equals(animalName)) {
+			icon = new ImageIcon("src/채연/타조.jpg");
+		} else if ("기린".equals(animalName)) {
+			icon = new ImageIcon("src/채연/기린.jpg");
+		} else if ("알파카".equals(animalName)) {
+			icon = new ImageIcon("src/채연/알파카.jpg");
+		}
+		if (icon == null || icon.getIconWidth() <= 0) {
 			label.setText(animalName);
 			return;
 		}
 		Image image = icon.getImage().getScaledInstance(168, 168, Image.SCALE_SMOOTH);
 		label.setIcon(new ImageIcon(image));
-	}
-
-	private static String findAssetPath(String fileName) {
-		return findImagePath("채연", fileName);
-	}
-
-	private static String findImagePath(String folderName, String fileName) {
-		File projectRootPath = new File(new File("src", folderName), fileName);
-		if (projectRootPath.exists()) {
-			return projectRootPath.getPath();
-		}
-		return new File(new File(folderName), fileName).getPath();
 	}
 
 	private static class BackgroundPanel extends JPanel {

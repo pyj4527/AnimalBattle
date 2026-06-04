@@ -3,7 +3,11 @@ package smarthome;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -13,7 +17,11 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import animal.Animal;
-import animal.GameManager;
+import animal.기린;
+import animal.알파카;
+import animal.원숭이;
+import animal.코끼리;
+import animal.타조;
 
 public class start extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -33,11 +41,65 @@ public class start extends JFrame {
 		contentPane.setPreferredSize(new Dimension(600, 420));
 		setContentPane(contentPane);
 
-		addSelectButton(contentPane, "코끼리", 22, 301, Color.BLUE);
-		addSelectButton(contentPane, "원숭이", 138, 301, Color.GREEN);
-		addSelectButton(contentPane, "타조", 253, 301, Color.ORANGE);
-		addSelectButton(contentPane, "기린", 370, 301, new Color(128, 0, 128));
-		addSelectButton(contentPane, "알파카", 485, 301, Color.PINK);
+		JButton 코끼리선택 = new JButton("선택하기");
+		코끼리선택.setBackground(Color.BLUE);
+		코끼리선택.setBounds(22, 301, 94, 40);
+		contentPane.add(코끼리선택);
+
+		JButton 원숭이선택 = new JButton("선택하기");
+		원숭이선택.setBackground(Color.GREEN);
+		원숭이선택.setBounds(138, 301, 94, 40);
+		contentPane.add(원숭이선택);
+
+		JButton 타조선택 = new JButton("선택하기");
+		타조선택.setBackground(Color.ORANGE);
+		타조선택.setBounds(253, 301, 94, 40);
+		contentPane.add(타조선택);
+
+		JButton 기린선택 = new JButton("선택하기");
+		기린선택.setBackground(new Color(128, 0, 128));
+		기린선택.setBounds(370, 301, 94, 40);
+		contentPane.add(기린선택);
+
+		JButton 알파카선택 = new JButton("선택하기");
+		알파카선택.setBackground(Color.PINK);
+		알파카선택.setBounds(485, 301, 94, 40);
+		contentPane.add(알파카선택);
+
+		코끼리선택.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Main(createPlayers("코끼리", "원숭이", "타조", "기린", "알파카")).setVisible(true);
+				dispose();
+			}
+		});
+
+		원숭이선택.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Main(createPlayers("원숭이", "코끼리", "타조", "기린", "알파카")).setVisible(true);
+				dispose();
+			}
+		});
+
+		타조선택.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Main(createPlayers("타조", "코끼리", "원숭이", "기린", "알파카")).setVisible(true);
+				dispose();
+			}
+		});
+
+		기린선택.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Main(createPlayers("기린", "코끼리", "원숭이", "타조", "알파카")).setVisible(true);
+				dispose();
+			}
+		});
+
+		알파카선택.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Main(createPlayers("알파카", "코끼리", "원숭이", "타조", "기린")).setVisible(true);
+				dispose();
+			}
+		});
 
 		JLabel backgroundLabel = new JLabel();
 		ImageIcon icon = new ImageIcon(findImagePath("채연", "동물레이스.png"));
@@ -50,18 +112,33 @@ public class start extends JFrame {
 		setLocationRelativeTo(null);
 	}
 
-	private void addSelectButton(JPanel contentPane, String animalName, int x, int y, Color backgroundColor) {
-		JButton selectButton = new JButton("선택하기");
-		selectButton.setBackground(backgroundColor);
-		selectButton.setBounds(x, y, 94, 40);
-		selectButton.addActionListener(e -> openGame(animalName));
-		contentPane.add(selectButton);
+	private List<Animal> createPlayers(String first, String second, String third, String fourth, String fifth) {
+		List<Animal> players = new ArrayList<Animal>();
+		players.add(createPlayer(first));
+		players.add(createPlayer(second));
+		players.add(createPlayer(third));
+		players.add(createPlayer(fourth));
+		players.add(createPlayer(fifth));
+		return players;
 	}
 
-	private void openGame(String selectedAnimalName) {
-		Animal[] animals = GameManager.createAnimalsWithSelectedFirst(selectedAnimalName);
-		new Main(animals).setVisible(true);
-		dispose();
+	private Animal createPlayer(String animalName) {
+		if ("코끼리".equals(animalName)) {
+			return new 코끼리();
+		}
+		if ("원숭이".equals(animalName)) {
+			return new 원숭이();
+		}
+		if ("타조".equals(animalName)) {
+			return new 타조();
+		}
+		if ("기린".equals(animalName)) {
+			return new 기린();
+		}
+		if ("알파카".equals(animalName)) {
+			return new 알파카();
+		}
+		return new 코끼리();
 	}
 
 	private static String findImagePath(String folderName, String fileName) {

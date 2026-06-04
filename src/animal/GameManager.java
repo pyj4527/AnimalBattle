@@ -1,7 +1,9 @@
 package animal;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 public class GameManager {
@@ -9,34 +11,35 @@ public class GameManager {
 	private static final int DICE_MAX = 6;
 
 	private final Random random = new Random();
-	private Animal[] animals;
-	private Animal[] itemUsersThisTurn = new Animal[0];
+	private final List<Animal> animals = new ArrayList<Animal>();
+	private final List<Animal> itemUsersThisTurn = new ArrayList<Animal>();
 	private Animal me;
 	private boolean itemPhase;
 	private int itemUserIndex;
 
-	public GameManager(Animal[] selectedAnimals) {
+	public GameManager(List<Animal> selectedAnimals) {
 		setAnimals(selectedAnimals);
 	}
 
-	public void setAnimals(Animal[] selectedAnimals) {
-		if (selectedAnimals == null || selectedAnimals.length == 0) {
-			animals = createAnimalsWithSelectedFirst("코끼리");
+	public void setAnimals(List<Animal> selectedAnimals) {
+		animals.clear();
+		if (selectedAnimals == null || selectedAnimals.isEmpty()) {
+			animals.addAll(createAnimalsWithSelectedFirst("코끼리"));
 		} else {
-			animals = selectedAnimals;
+			animals.addAll(selectedAnimals);
 		}
-		me = animals[0];
+		me = animals.get(0);
 		itemPhase = false;
 		itemUserIndex = 0;
-		itemUsersThisTurn = new Animal[0];
+		itemUsersThisTurn.clear();
 	}
 
 	public DiceTurnResult rollDiceTurn() {
-		int[] diceValues = new int[animals.length];
-		for (int i = 0; i < animals.length; i++) {
+		List<Integer> diceValues = new ArrayList<Integer>();
+		for (Animal animal : animals) {
 			int dice = rollDice();
-			animals[i].move(dice);
-			diceValues[i] = dice;
+			animal.move(dice);
+			diceValues.add(Integer.valueOf(dice));
 		}
 		return new DiceTurnResult(animals, diceValues);
 	}
@@ -59,44 +62,42 @@ public class GameManager {
 		for (Animal animal : animals) {
 			animal.markDistanceAfterDice();
 		}
-		itemUsersThisTurn = getItemUsersAfterDice();
+		itemUsersThisTurn.clear();
+		itemUsersThisTurn.addAll(getItemUsersAfterDice());
 		itemPhase = true;
 		itemUserIndex = 0;
 	}
 
-	public Animal[] getItemUsersAfterDice() {
-		Animal[] rankedAnimals = Arrays.copyOf(animals, animals.length);
-		Arrays.sort(rankedAnimals, new Comparator<Animal>() {
+	public List<Animal> getItemUsersAfterDice() {
+		List<Animal> rankedAnimals = new ArrayList<Animal>(animals);
+		Collections.sort(rankedAnimals, new Comparator<Animal>() {
 			public int compare(Animal first, Animal second) {
 				return second.getDistanceAfterDice() - first.getDistanceAfterDice();
 			}
 		});
 
-		Animal firstPlace = rankedAnimals[0];
-		Animal[] tempItemUsers = new Animal[animals.length];
-		int count = 0;
+		Animal firstPlace = rankedAnimals.get(0);
+		List<Animal> itemUsers = new ArrayList<Animal>();
 		if (me != firstPlace) {
-			tempItemUsers[count] = me;
-			count++;
+			itemUsers.add(me);
 		}
 		for (Animal animal : animals) {
 			if (animal != me && animal != firstPlace) {
-				tempItemUsers[count] = animal;
-				count++;
+				itemUsers.add(animal);
 			}
 		}
-		return Arrays.copyOf(tempItemUsers, count);
+		return itemUsers;
 	}
 
 	public boolean hasCurrentItemUser() {
-		return itemPhase && itemUserIndex < itemUsersThisTurn.length;
+		return itemPhase && itemUserIndex < itemUsersThisTurn.size();
 	}
 
 	public Animal getCurrentItemUser() {
 		if (!hasCurrentItemUser()) {
 			return null;
 		}
-		return itemUsersThisTurn[itemUserIndex];
+		return itemUsersThisTurn.get(itemUserIndex);
 	}
 
 	public void moveToNextItemUser() {
@@ -106,7 +107,7 @@ public class GameManager {
 	public void finishItemPhase() {
 		itemPhase = false;
 		itemUserIndex = 0;
-		itemUsersThisTurn = new Animal[0];
+		itemUsersThisTurn.clear();
 	}
 
 	public ItemResult useRandomItem(Animal attacker) {
@@ -143,18 +144,16 @@ public class GameManager {
 	}
 
 	public Animal pickTarget(Animal attacker) {
-		Animal[] targets = new Animal[animals.length - 1];
-		int count = 0;
+		List<Animal> targets = new ArrayList<Animal>();
 		for (Animal animal : animals) {
 			if (animal != attacker) {
-				targets[count] = animal;
-				count++;
+				targets.add(animal);
 			}
 		}
-		if (count == 0) {
+		if (targets.isEmpty()) {
 			return null;
 		}
-		return targets[random.nextInt(count)];
+		return targets.get(random.nextInt(targets.size()));
 	}
 
 	public Animal findWinner() {
@@ -173,7 +172,7 @@ public class GameManager {
 		finishItemPhase();
 	}
 
-	public Animal[] getAnimals() {
+	public List<Animal> getAnimals() {
 		return animals;
 	}
 
@@ -189,26 +188,22 @@ public class GameManager {
 		return itemUserIndex;
 	}
 
-	public static Animal[] createDefaultAnimals() {
-		Animal[] defaults = {
-			new 코끼리(),
-			new 원숭이(),
-			new 타조(),
-			new 기린(),
-			new 알파카()
-		};
+	public static List<Animal> createDefaultAnimals() {
+		List<Animal> defaults = new ArrayList<Animal>();
+		defaults.add(new 코끼리());
+		defaults.add(new 원숭이());
+		defaults.add(new 타조());
+		defaults.add(new 기린());
+		defaults.add(new 알파카());
 		return defaults;
 	}
 
-	public static Animal[] createAnimalsWithSelectedFirst(String selectedName) {
-		Animal[] animals = createDefaultAnimals();
-		for (int i = 0; i < animals.length; i++) {
-			if (animals[i].getName().equals(selectedName)) {
-				Animal selected = animals[i];
-				for (int j = i; j > 0; j--) {
-					animals[j] = animals[j - 1];
-				}
-				animals[0] = selected;
+	public static List<Animal> createAnimalsWithSelectedFirst(String selectedName) {
+		List<Animal> animals = createDefaultAnimals();
+		for (int i = 0; i < animals.size(); i++) {
+			if (animals.get(i).getName().equals(selectedName)) {
+				Animal selected = animals.remove(i);
+				animals.add(0, selected);
 				break;
 			}
 		}
@@ -216,27 +211,27 @@ public class GameManager {
 	}
 
 	public static class DiceTurnResult {
-		private final Animal[] animals;
-		private final int[] diceValues;
+		private final List<Animal> animals;
+		private final List<Integer> diceValues;
 
-		private DiceTurnResult(Animal[] animals, int[] diceValues) {
-			this.animals = animals;
-			this.diceValues = diceValues;
+		private DiceTurnResult(List<Animal> animals, List<Integer> diceValues) {
+			this.animals = new ArrayList<Animal>(animals);
+			this.diceValues = new ArrayList<Integer>(diceValues);
 		}
 
-		public Animal[] getAnimals() {
+		public List<Animal> getAnimals() {
 			return animals;
 		}
 
-		public int[] getDiceValues() {
+		public List<Integer> getDiceValues() {
 			return diceValues;
 		}
 
 		public String toMessage() {
 			StringBuilder message = new StringBuilder();
-			for (int i = 0; i < animals.length; i++) {
-				message.append(animals[i].getName()).append(" ")
-						.append(diceValues[i]).append("칸  ");
+			for (int i = 0; i < animals.size(); i++) {
+				message.append(animals.get(i).getName()).append(" ")
+						.append(diceValues.get(i)).append("칸  ");
 			}
 			return message.toString();
 		}

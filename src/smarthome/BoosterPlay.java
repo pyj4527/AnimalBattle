@@ -3,6 +3,8 @@ package smarthome;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.ImageIcon;
@@ -97,13 +99,21 @@ public class BoosterPlay extends JFrame {
 		boosterButton.setBackground(new Color(0, 135, 255));
 		boosterButton.setFocusPainted(false);
 		boosterButton.setBounds(362, 590, 220, 44);
-		boosterButton.addActionListener(e -> playBooster());
+		boosterButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				playBooster();
+			}
+		});
 		contentPane.add(boosterButton);
 
 		JButton closeButton = new JButton("닫기");
 		closeButton.setFont(new Font("Malgun Gothic", Font.BOLD, 14));
 		closeButton.setBounds(795, 590, 105, 34);
-		closeButton.addActionListener(e -> dispose());
+		closeButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		contentPane.add(closeButton);
 	}
 
@@ -137,21 +147,23 @@ public class BoosterPlay extends JFrame {
 		appendConsoleMessage("부스터 발동!");
 
 		Timer timer = new Timer(80, null);
-		timer.addActionListener(e -> {
-			int currentValue = distanceProgressBar.getValue();
-			if (currentValue < afterDistance) {
-				int nextValue = Math.min(afterDistance, currentValue + 1);
-				distanceProgressBar.setValue(nextValue);
-				updateDistanceText(nextValue);
-				return;
-			}
+		timer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int currentValue = distanceProgressBar.getValue();
+				if (currentValue < afterDistance) {
+					int nextValue = Math.min(afterDistance, currentValue + 1);
+					distanceProgressBar.setValue(nextValue);
+					updateDistanceText(nextValue);
+					return;
+				}
 
-			((Timer) e.getSource()).stop();
-			appendConsoleMessage(animalName + " 부스터 : 거리 " + beforeDistance + " -> " + afterDistance);
-			if (boosterAction != null) {
-				boosterAction.run();
+				((Timer) e.getSource()).stop();
+				appendConsoleMessage(animalName + " 부스터 : 거리 " + beforeDistance + " -> " + afterDistance);
+				if (boosterAction != null) {
+					boosterAction.run();
+				}
+				boosterFinished = true;
 			}
-			boosterFinished = true;
 		});
 		timer.start();
 	}

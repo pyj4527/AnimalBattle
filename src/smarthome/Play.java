@@ -3,6 +3,8 @@ package smarthome;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.ImageIcon;
@@ -92,7 +94,11 @@ public class Play extends JFrame {
 		arrowButton.setContentAreaFilled(false);
 		arrowButton.setFocusPainted(false);
 		arrowButton.setBounds(408, 193, 140, 105);
-		arrowButton.addActionListener(e -> playAttack());
+		arrowButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				playAttack();
+			}
+		});
 		contentPane.add(arrowButton);
 
 		attackerNameLabel = new JLabel("", SwingConstants.CENTER);
@@ -142,7 +148,11 @@ public class Play extends JFrame {
 		JButton closeButton = new JButton("닫기");
 		closeButton.setFont(new Font("Malgun Gothic", Font.BOLD, 14));
 		closeButton.setBounds(835, 600, 105, 30);
-		closeButton.addActionListener(e -> dispose());
+		closeButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		contentPane.add(closeButton);
 	}
 

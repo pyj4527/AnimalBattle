@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -34,8 +35,7 @@ public class Main extends JFrame {
 	private static final int PLAYER_COUNT = 5;
 
 	private final GameManager gameManager;
-	private final AnimalView[] animalViews = new AnimalView[PLAYER_COUNT];
-	private int animalViewCount;
+	private final java.util.List<AnimalView> animalViews = new java.util.ArrayList<AnimalView>();
 
 	private JPanel contentPane;
 	private JPanel animalsPanel;
@@ -57,7 +57,7 @@ public class Main extends JFrame {
 		this(GameManager.createDefaultAnimals());
 	}
 
-	public Main(Animal[] selectedAnimals) {
+	public Main(List<Animal> selectedAnimals) {
 		gameManager = new GameManager(selectedAnimals);
 		setTitle("공격 대상 선택");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -216,15 +216,14 @@ public class Main extends JFrame {
 
 	private void createAnimalViews() {
 		animalsPanel.removeAll();
-		animalViewCount = 0;
+		animalViews.clear();
 
 		int index = 0;
 		for (Animal animal : gameManager.getAnimals()) {
 			AnimalView view = new AnimalView(animal);
 			int y = index == 0 ? 0 : index * 104 + 14;
 			view.panel.setBounds(0, y, 620, 96);
-			animalViews[animalViewCount] = view;
-			animalViewCount++;
+			animalViews.add(view);
 			animalsPanel.add(view.panel);
 			if (index == 0) {
 				JLabel separatorLine = new JLabel();
@@ -438,8 +437,8 @@ public class Main extends JFrame {
 			targetComboBox.setSelectedItem(selectedTarget);
 		}
 
-		for (int i = 0; i < animalViewCount; i++) {
-			animalViews[i].refresh();
+		for (AnimalView view : animalViews) {
+			view.refresh();
 		}
 
 		if (gameManager.hasCurrentItemUser()) {
