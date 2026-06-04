@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -60,7 +59,7 @@ public class start extends JFrame {
 	}
 
 	private void openGame(String selectedAnimalName) {
-		List<Animal> animals = GameManager.createAnimalsWithSelectedFirst(selectedAnimalName);
+		Animal[] animals = GameManager.createAnimalsWithSelectedFirst(selectedAnimalName);
 		new Main(animals).setVisible(true);
 		dispose();
 	}

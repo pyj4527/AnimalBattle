@@ -10,8 +10,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -36,7 +34,8 @@ public class Main extends JFrame {
 	private static final int PLAYER_COUNT = 5;
 
 	private final GameManager gameManager;
-	private final List<AnimalView> animalViews = new ArrayList<AnimalView>();
+	private final AnimalView[] animalViews = new AnimalView[PLAYER_COUNT];
+	private int animalViewCount;
 
 	private JPanel contentPane;
 	private JPanel animalsPanel;
@@ -58,7 +57,7 @@ public class Main extends JFrame {
 		this(GameManager.createDefaultAnimals());
 	}
 
-	public Main(List<Animal> selectedAnimals) {
+	public Main(Animal[] selectedAnimals) {
 		gameManager = new GameManager(selectedAnimals);
 		setTitle("공격 대상 선택");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -163,12 +162,14 @@ public class Main extends JFrame {
 		itemMessagePanel = new JPanel(new BorderLayout());
 		itemMessagePanel.setBounds(12, 324, 225, 214);
 		itemMessagePanel.setBorder(BorderFactory.createTitledBorder("진행 안내"));
-		itemMessagePanel.setOpaque(false);
+		itemMessagePanel.setBackground(Color.WHITE);
+		itemMessagePanel.setOpaque(true);
 		currentPanel.add(itemMessagePanel);
 
 		actionMessageTextArea = new JTextArea();
 		actionMessageTextArea.setEditable(false);
-		actionMessageTextArea.setOpaque(false);
+		actionMessageTextArea.setBackground(Color.WHITE);
+		actionMessageTextArea.setOpaque(true);
 		actionMessageTextArea.setLineWrap(true);
 		actionMessageTextArea.setWrapStyleWord(true);
 		actionMessageTextArea.setFont(new Font("Malgun Gothic", Font.BOLD, 15));
@@ -187,7 +188,9 @@ public class Main extends JFrame {
 
 		turnInfoLabel = new JLabel("주사위를 굴려주세요.");
 		turnInfoLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		turnInfoLabel.setBounds(273, 590, 480, 20);
+		turnInfoLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 18));
+		turnInfoLabel.setForeground(Color.BLACK);
+		turnInfoLabel.setBounds(273, 585, 480, 32);
 		contentPane.add(turnInfoLabel);
 
 		rollButton = new JButton("주사위 굴리기");
@@ -213,14 +216,23 @@ public class Main extends JFrame {
 
 	private void createAnimalViews() {
 		animalsPanel.removeAll();
-		animalViews.clear();
+		animalViewCount = 0;
 
 		int index = 0;
 		for (Animal animal : gameManager.getAnimals()) {
 			AnimalView view = new AnimalView(animal);
-			view.panel.setBounds(0, index * 104, 620, 96);
-			animalViews.add(view);
+			int y = index == 0 ? 0 : index * 104 + 14;
+			view.panel.setBounds(0, y, 620, 96);
+			animalViews[animalViewCount] = view;
+			animalViewCount++;
 			animalsPanel.add(view.panel);
+			if (index == 0) {
+				JLabel separatorLine = new JLabel();
+				separatorLine.setOpaque(true);
+				separatorLine.setBackground(Color.LIGHT_GRAY);
+				separatorLine.setBounds(0, 105, 620, 3);
+				animalsPanel.add(separatorLine);
+			}
 			index++;
 			if (index == PLAYER_COUNT) {
 				break;
@@ -426,8 +438,8 @@ public class Main extends JFrame {
 			targetComboBox.setSelectedItem(selectedTarget);
 		}
 
-		for (AnimalView view : animalViews) {
-			view.refresh();
+		for (int i = 0; i < animalViewCount; i++) {
+			animalViews[i].refresh();
 		}
 
 		if (gameManager.hasCurrentItemUser()) {
@@ -517,7 +529,11 @@ public class Main extends JFrame {
 
 		private void refresh() {
 			setAnimalImage(imageLabel, animal, 115, 78);
-			nameLabel.setText(animal.getName());
+			if (animal == gameManager.getMe()) {
+				nameLabel.setText("내 캐릭터 : " + animal.getName());
+			} else {
+				nameLabel.setText(animal.getName());
+			}
 			progressBar.setValue(animal.getDisplayDistance());
 			progressBar.setString(animal.getDisplayDistance() + " / " + Animal.GOAL_DISTANCE);
 			distanceValueLabel.setText("거리 " + animal.getDistance() + "칸");
