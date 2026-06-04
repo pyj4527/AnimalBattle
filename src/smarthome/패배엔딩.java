@@ -2,7 +2,6 @@ package smarthome;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
@@ -12,7 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import animal.Animal;
@@ -35,25 +33,15 @@ public class 패배엔딩 extends JFrame {
 		contentPane.setLayout(null);
 		setContentPane(contentPane);
 
-		JLabel titleLabel = new JLabel("패배했습니다", SwingConstants.CENTER);
-		titleLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 30));
-		titleLabel.setBounds(0, 42, 600, 44);
-		contentPane.add(titleLabel);
-
-		JLabel animalImageLabel = new JLabel("", SwingConstants.CENTER);
-		animalImageLabel.setBounds(216, 132, 168, 168);
+		JLabel animalImageLabel = new JLabel("");
+		animalImageLabel.setBounds(213, 160, 168, 168);
 		setAnimalImage(animalImageLabel, animalName);
 		contentPane.add(animalImageLabel);
-
-		JLabel nameLabel = new JLabel(animalName, SwingConstants.CENTER);
-		nameLabel.setFont(new Font("Malgun Gothic", Font.BOLD, 20));
-		nameLabel.setBounds(216, 306, 168, 30);
-		contentPane.add(nameLabel);
 
 		JButton mainMenuButton = new JButton("메인 메뉴로");
 		mainMenuButton.setBackground(Color.BLUE);
 		mainMenuButton.setForeground(Color.WHITE);
-		mainMenuButton.setBounds(216, 352, 168, 42);
+		mainMenuButton.setBounds(213, 353, 168, 42);
 		mainMenuButton.addActionListener(e -> {
 			new start().setVisible(true);
 			dispose();
