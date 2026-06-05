@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,7 +101,7 @@ public class start extends JFrame {
 		});
 
 		JLabel backgroundLabel = new JLabel();
-		ImageIcon icon = new ImageIcon(findImagePath("채연", "동물레이스.png"));
+		ImageIcon icon = createImageIcon("/images/start/동물레이스.png");
 		Image image = icon.getImage().getScaledInstance(600, 420, Image.SCALE_SMOOTH);
 		backgroundLabel.setIcon(new ImageIcon(image));
 		backgroundLabel.setBounds(0, -10, 600, 420);
@@ -141,11 +140,11 @@ public class start extends JFrame {
 		return new 코끼리();
 	}
 
-	private static String findImagePath(String folderName, String fileName) {
-		File projectRootPath = new File(new File("src", folderName), fileName);
-		if (projectRootPath.exists()) {
-			return projectRootPath.getPath();
+	private static ImageIcon createImageIcon(String resourcePath) {
+		java.net.URL imageUrl = start.class.getResource(resourcePath);
+		if (imageUrl == null) {
+			return new ImageIcon();
 		}
-		return new File(new File(folderName), fileName).getPath();
+		return new ImageIcon(imageUrl);
 	}
 }

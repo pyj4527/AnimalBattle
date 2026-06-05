@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -206,19 +205,18 @@ public class Play extends JFrame {
 		progressBar.setString(value + " / " + Animal.GOAL_DISTANCE);
 	}
 
-	private void setImage(JLabel label, String imagePath, String fallbackText) {
-		if (imagePath == null || imagePath.trim().isEmpty()) {
+	private void setImage(JLabel label, String resourcePath, String fallbackText) {
+		if (resourcePath == null || resourcePath.trim().isEmpty()) {
 			label.setIcon(null);
 			label.setText(fallbackText);
 			return;
 		}
-		File imageFile = new File(imagePath);
-		if (!imageFile.exists()) {
+		ImageIcon originalIcon = createImageIcon(resourcePath);
+		if (originalIcon.getIconWidth() <= 0) {
 			label.setIcon(null);
 			label.setText(fallbackText);
 			return;
 		}
-		ImageIcon originalIcon = new ImageIcon(imagePath);
 		Image scaledImage = originalIcon.getImage().getScaledInstance(
 				label.getWidth(), label.getHeight(), Image.SCALE_SMOOTH);
 		label.setText("");
@@ -226,19 +224,19 @@ public class Play extends JFrame {
 	}
 
 	private String getAttackImagePath(String animalName) {
-		return findImagePath("attack", animalName + "공격.png");
+		return "/images/attack/" + animalName + "공격.png";
 	}
 
 	private String getHitImagePath(String animalName) {
-		return findImagePath("hit", animalName + "공격받음.png");
+		return "/images/hit/" + animalName + "공격받음.png";
 	}
 
-	private String findImagePath(String type, String fileName) {
-		File projectRootPath = new File(new File(new File(new File("src", "혜주"), "images"), type), fileName);
-		if (projectRootPath.exists()) {
-			return projectRootPath.getPath();
+	private static ImageIcon createImageIcon(String resourcePath) {
+		java.net.URL imageUrl = Play.class.getResource(resourcePath);
+		if (imageUrl == null) {
+			return new ImageIcon();
 		}
-		return new File(new File(new File("혜주", "images"), type), fileName).getPath();
+		return new ImageIcon(imageUrl);
 	}
 
 	private void clearConsole() {

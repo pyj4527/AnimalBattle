@@ -1,7 +1,5 @@
 package animal;
 
-import java.io.File;
-
 public abstract class Animal {
 	public static final int GOAL_DISTANCE = 30;
 	public static final int ITEM_DISTANCE = 2;
@@ -109,14 +107,6 @@ public abstract class Animal {
 	}
 
 	public static String findAnimalImagePath(String animalName) {
-		return findImagePath("채연", animalName + ".jpg");
-	}
-
-	private static String findImagePath(String folderName, String fileName) {
-		File projectRootPath = new File(new File("src", folderName), fileName);
-		if (projectRootPath.exists()) {
-			return projectRootPath.getPath();
-		}
-		return new File(new File(folderName), fileName).getPath();
+		return "/images/end/" + animalName + ".jpg";
 	}
 }

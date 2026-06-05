@@ -26,7 +26,7 @@ public class 승리엔딩 extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 
-		JPanel contentPane = new BackgroundPanel("src/채연/승리엔딩1.png");
+		JPanel contentPane = new BackgroundPanel("/images/end/승리엔딩1.png");
 		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		contentPane.setLayout(null);
 		contentPane.setPreferredSize(new Dimension(600, 420));
@@ -55,15 +55,15 @@ public class 승리엔딩 extends JFrame {
 	private void setEndingImage(JLabel label, String animalName) {
 		ImageIcon icon = null;
 		if ("코끼리".equals(animalName)) {
-			icon = new ImageIcon("src/채연/코끼리세레머니.jpg");
+			icon = createImageIcon("/images/end/코끼리세레머니.jpg");
 		} else if ("원숭이".equals(animalName)) {
-			icon = new ImageIcon("src/채연/원숭이세레머니.jpg");
+			icon = createImageIcon("/images/end/원숭이세레머니.jpg");
 		} else if ("타조".equals(animalName)) {
-			icon = new ImageIcon("src/채연/타조세레머니.jpg");
+			icon = createImageIcon("/images/end/타조세레머니.jpg");
 		} else if ("기린".equals(animalName)) {
-			icon = new ImageIcon("src/채연/기린세레머니.jpg");
+			icon = createImageIcon("/images/end/기린세레머니.jpg");
 		} else if ("알파카".equals(animalName)) {
-			icon = new ImageIcon("src/채연/알파카세레머니.jpg");
+			icon = createImageIcon("/images/end/알파카세레머니.jpg");
 		}
 		if (icon == null || icon.getIconWidth() <= 0) {
 			label.setText(animalName);
@@ -73,13 +73,21 @@ public class 승리엔딩 extends JFrame {
 		label.setIcon(new ImageIcon(image));
 	}
 
+	private static ImageIcon createImageIcon(String resourcePath) {
+		java.net.URL imageUrl = 승리엔딩.class.getResource(resourcePath);
+		if (imageUrl == null) {
+			return new ImageIcon();
+		}
+		return new ImageIcon(imageUrl);
+	}
+
 	private static class BackgroundPanel extends JPanel {
 		private static final long serialVersionUID = 1L;
 		private final Image backgroundImage;
 
 		private BackgroundPanel(String imagePath) {
-			backgroundImage = imagePath == null || imagePath.trim().isEmpty()
-					? null : new ImageIcon(imagePath).getImage();
+			ImageIcon icon = createImageIcon(imagePath);
+			backgroundImage = icon.getIconWidth() <= 0 ? null : icon.getImage();
 		}
 
 		protected void paintComponent(Graphics g) {

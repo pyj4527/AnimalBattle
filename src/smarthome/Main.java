@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -478,7 +477,7 @@ public class Main extends JFrame {
 	}
 
 	private void setAnimalImage(JLabel label, Animal animal, int width, int height) {
-		ImageIcon icon = new ImageIcon(animal.getImagePath());
+		ImageIcon icon = createImageIcon(animal.getImagePath());
 		if (icon.getIconWidth() <= 0) {
 			label.setIcon(null);
 			label.setText(animal.getName());
@@ -540,15 +539,15 @@ public class Main extends JFrame {
 	}
 
 	private static String findAssetPath(String fileName) {
-		return findImagePath("채연", fileName);
+		return "/images/start/" + fileName;
 	}
 
-	private static String findImagePath(String folderName, String fileName) {
-		File projectRootPath = new File(new File("src", folderName), fileName);
-		if (projectRootPath.exists()) {
-			return projectRootPath.getPath();
+	private static ImageIcon createImageIcon(String resourcePath) {
+		java.net.URL imageUrl = Main.class.getResource(resourcePath);
+		if (imageUrl == null) {
+			return new ImageIcon();
 		}
-		return new File(new File(folderName), fileName).getPath();
+		return new ImageIcon(imageUrl);
 	}
 
 	private static class BackgroundPanel extends JPanel {
@@ -556,8 +555,8 @@ public class Main extends JFrame {
 		private final Image backgroundImage;
 
 		private BackgroundPanel(String imagePath) {
-			backgroundImage = imagePath == null || imagePath.trim().isEmpty()
-					? null : new ImageIcon(imagePath).getImage();
+			ImageIcon icon = createImageIcon(imagePath);
+			backgroundImage = icon.getIconWidth() <= 0 ? null : icon.getImage();
 		}
 
 		protected void paintComponent(Graphics g) {
